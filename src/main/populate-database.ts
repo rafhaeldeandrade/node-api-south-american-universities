@@ -5,6 +5,7 @@ import env from '@/main/config/environment-variables'
 import { University } from '@/domain/entities/university'
 import { UniversityModel } from '@/infra/mongodb/schemas/university'
 import { mongooseHelper } from '@/infra/mongodb/helper'
+import { UpdateModel } from '@/infra/mongodb/schemas/update'
 
 const currentHours = new Date().getHours()
 
@@ -54,6 +55,9 @@ async function insertManyWithRetry(universities: University[]) {
     try {
       await UniversityModel.deleteMany({})
       await UniversityModel.insertMany(universities)
+      await UpdateModel.create({
+        generatedAt: new Date(),
+      })
       console.log('Registros inseridos com sucesso')
 
       return
@@ -86,4 +90,5 @@ async function fetchUniversities(country: string): Promise<void> {
 }
 
 populateDatabase()
+console.log('Now running every 24 hours...')
 cron.schedule(`0 ${currentHours} * * *`, populateDatabase)

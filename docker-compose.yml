@@ -1,25 +1,25 @@
 services:
-  south-americans-api:
-    container_name: south-americans-api
-    build:
-      context: ../
-      dockerfile: ./docker/dockerfile
-      target: development
-    command: yarn dev
-    volumes:
-      - ../src:/usr/src/app/src
-      - ../.env:/usr/src/app/.env
-    ports:
-      - '4000:4000'
-    depends_on:
-      - mongodb
-    networks:
-      - south-americans-api-network
+  # south-americans-api:
+  #   container_name: south-americans-api
+  #   build:
+  #     context: ../
+  #     dockerfile: ./docker/dockerfile
+  #     target: development
+  #   command: yarn dev
+  #   volumes:
+  #     - ../src:/usr/src/app/src
+  #     - ../.env:/usr/src/app/.env
+  #   ports:
+  #     - '4000:4000'
+  #   depends_on:
+  #     - mongodb
+  #   networks:
+  #     - south-americans-api-network
   mongodb:
     container_name: mongodb
     image: 'mongo:4.4.0-bionic'
     ports:
-      - '27018:27017'
+      - '27017:27017'
     volumes:
       - './data:/data/db'
     restart: on-failure

@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "populatedb": "tsc-alias && tsnd -r tsconfig-paths/register src/main/populate-database.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install"
   },
@@ -26,12 +27,16 @@
     "lint-staged": "^13.2.2",
     "prettier": "^2.8.8",
     "ts-jest": "^29.1.0",
+    "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },
   "dependencies": {
     "axios": "^1.4.0",
     "axios-retry": "^3.4.0",
     "mongoose": "^7.1.0",
-    "node-cron": "^3.0.2"
+    "node-cron": "^3.0.2",
+    "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.6",
+    "tsconfig-paths": "^4.2.0"
   }
 }
