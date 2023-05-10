@@ -5,7 +5,7 @@ import {
 } from '@/domain/usecases/create-account'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
-import { AccountRepository } from '@/domain/contracts'
+import { AccountRepository } from '@/domain/repositories/account'
 import { EmailAlreadyExistsError } from '../errors/email-already-exists'
 import { EmailValidator } from '@/infra/contracts'
 
