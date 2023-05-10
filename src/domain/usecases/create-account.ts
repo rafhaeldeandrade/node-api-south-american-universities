@@ -1,6 +1,6 @@
 import { UseCase } from '@/domain/contracts'
 
-interface CreateAccountUseCaseInput {
+export interface CreateAccountUseCaseInput {
   name: string
   email: string
   password: string
