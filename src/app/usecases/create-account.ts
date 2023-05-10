@@ -21,7 +21,10 @@ export class CreateAccount implements CreateAccountUseCase {
 
     await this.accountRepository.save(dto)
 
-    return {} as unknown as CreateAccountUseCaseOutput
+    return {
+      name: dto.name,
+      email: dto.email,
+    }
   }
 
   validateDTO(dto: CreateAccountUseCaseInput) {
@@ -39,10 +42,7 @@ export class CreateAccount implements CreateAccountUseCase {
   }
 
   validateName(name: string): boolean {
-    const hasNumber = /[0-9]/.test(name)
-    const hasSpecialChar = /[˜!@#$%ˆ&*()_+=`[\]\\}|\\;:"'<,>?/]/.test(name)
-
-    return !hasNumber && !hasSpecialChar && name.length >= 3
+    return name.length >= 3
   }
 
   validatePassword(password: string): boolean {
