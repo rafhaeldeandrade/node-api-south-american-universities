@@ -6,6 +6,7 @@ import {
   CreateAccountUseCaseOutput,
 } from '@/domain/usecases/create-account'
 import { MissingParamError } from '@/app/errors/missing-param'
+import { InvalidParamError } from '@/app/errors/invalid-param'
 
 class CreateAccountUseCaseStub implements CreateAccountUseCase {
   async execute() {
@@ -100,6 +101,23 @@ describe('Create Account Controller', () => {
     expect(httpResponse.body).toEqual({
       error: true,
       message: `${paramName} param is missing.`,
+    })
+  })
+
+  it('should return 400 if useCase throws InvalidParamError', async () => {
+    const { sut, createAccountUseCaseStub } = makeSut()
+    const request = makeRequest()
+    const paramName = faker.internet.userName()
+    jest
+      .spyOn(createAccountUseCaseStub, 'execute')
+      .mockRejectedValueOnce(new InvalidParamError(paramName))
+
+    const httpResponse = await sut.handle(request)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual({
+      error: true,
+      message: `${paramName} param is invalid.`,
     })
   })
 })
