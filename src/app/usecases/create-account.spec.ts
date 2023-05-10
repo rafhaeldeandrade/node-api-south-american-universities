@@ -8,12 +8,14 @@ import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
 import { Account } from '@/domain/entities/account'
 import { EmailValidator } from '@/infra/contracts'
 import { Hasher } from '@/app/contracts/hasher'
+import { Encrypter } from '../contracts/encrypter'
+import { UUIDGenerator } from '../contracts/uuid-generator'
 
 function generateRandomInvalidEmail(): string {
   const invalidTLDs = ['.invalid', '.test', '.example', '.localhost']
 
   const username = faker.internet.userName()
-  const domain = 'invalid' // Common invalid domain
+  const domain = 'invalid'
   const randomTLDIndex = Math.floor(Math.random() * invalidTLDs.length)
   const tld = invalidTLDs[randomTLDIndex]
 
@@ -95,6 +97,7 @@ function shuffleString(str: string): string {
 
 function makeFakeAccount() {
   return {
+    id: faker.datatype.uuid(),
     name: faker.name.fullName(),
     email: faker.internet.email(),
     password: generateRandomValidPassword(),
@@ -114,7 +117,7 @@ class AccountRepositoryStub implements AccountRepository {
   }
 
   save(account: Account) {
-    return Promise.resolve()
+    return Promise.resolve(makeFakeAccount())
   }
 }
 
@@ -124,23 +127,48 @@ class HasherStub implements Hasher {
   }
 }
 
+class EncrypterStub implements Encrypter {
+  encrypt(value: string) {
+    return faker.datatype.uuid()
+  }
+}
+
+class UUIDGeneratorStub implements UUIDGenerator {
+  generateUUID(): string {
+    return faker.datatype.uuid()
+  }
+}
+
 interface SutTypes {
   sut: CreateAccount
   emailValidatorStub: EmailValidator
   accountRepositoryStub: AccountRepository
   hasherStub: Hasher
+  encrypterStub: Encrypter
+  uuidGeneratorStub: UUIDGenerator
 }
 
 function makeSut(): SutTypes {
   const emailValidatorStub = new EmailValidatorStub()
   const accountRepositoryStub = new AccountRepositoryStub()
   const hasherStub = new HasherStub()
+  const encrypterStub = new EncrypterStub()
+  const uuidGeneratorStub = new UUIDGeneratorStub()
   const sut = new CreateAccount(
     emailValidatorStub,
     accountRepositoryStub,
-    hasherStub
+    uuidGeneratorStub,
+    hasherStub,
+    encrypterStub
   )
-  return { sut, emailValidatorStub, accountRepositoryStub, hasherStub }
+  return {
+    sut,
+    emailValidatorStub,
+    accountRepositoryStub,
+    uuidGeneratorStub,
+    hasherStub,
+    encrypterStub,
+  }
 }
 
 function makeDTOWithout(
@@ -260,6 +288,17 @@ describe('Create Account Use Case', () => {
     await expect(result).rejects.toThrow(new EmailAlreadyExistsError())
   })
 
+  it('should call uuidGenerator.generateUUID', async () => {
+    const { sut, uuidGeneratorStub } = makeSut()
+    const generateUUIDSpy = jest.spyOn(uuidGeneratorStub, 'generateUUID')
+    const dto = makeDTOWithout()
+
+    await sut.execute(dto as CreateAccountUseCaseInput)
+
+    expect(generateUUIDSpy).toHaveBeenCalledTimes(1)
+    expect(generateUUIDSpy).toHaveBeenCalledWith()
+  })
+
   it('should call Hasher.hash with the correct value', async () => {
     const { sut, hasherStub } = makeSut()
     const hashSpy = jest.spyOn(hasherStub, 'hash')
@@ -272,7 +311,10 @@ describe('Create Account Use Case', () => {
   })
 
   it('should call AccountRepository.save with the correct values', async () => {
-    const { sut, accountRepositoryStub, hasherStub } = makeSut()
+    const { sut, uuidGeneratorStub, accountRepositoryStub, hasherStub } =
+      makeSut()
+    const fakeUuid = faker.datatype.uuid()
+    jest.spyOn(uuidGeneratorStub, 'generateUUID').mockReturnValueOnce(fakeUuid)
     const saveSpy = jest.spyOn(accountRepositoryStub, 'save')
     const fakeHashedPassword = faker.datatype.uuid()
     jest.spyOn(hasherStub, 'hash').mockResolvedValueOnce(fakeHashedPassword)
@@ -283,7 +325,23 @@ describe('Create Account Use Case', () => {
     expect(saveSpy).toHaveBeenCalledTimes(1)
     expect(saveSpy).toHaveBeenCalledWith({
       ...dto,
+      id: fakeUuid,
       password: fakeHashedPassword,
+    })
+  })
+
+  it('should call Encrypter.encrypt with the correct value', async () => {
+    const { sut, encrypterStub, uuidGeneratorStub } = makeSut()
+    const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
+    const fakeUuid = faker.datatype.uuid()
+    jest.spyOn(uuidGeneratorStub, 'generateUUID').mockReturnValueOnce(fakeUuid)
+    const dto = makeDTOWithout()
+
+    await sut.execute(dto as CreateAccountUseCaseInput)
+
+    expect(encryptSpy).toHaveBeenCalledTimes(1)
+    expect(encryptSpy).toHaveBeenCalledWith({
+      id: fakeUuid,
     })
   })
 
