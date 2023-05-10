@@ -19,6 +19,8 @@ export class CreateAccount implements CreateAccountUseCase {
     const account = await this.accountRepository.findByEmail(dto.email)
     if (account) throw new EmailAlreadyExistsError()
 
+    await this.accountRepository.save(dto)
+
     return {} as unknown as CreateAccountUseCaseOutput
   }
 

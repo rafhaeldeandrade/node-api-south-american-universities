@@ -6,4 +6,5 @@ export interface UseCase<Input, Output> {
 
 export interface AccountRepository {
   findByEmail(email: string): Promise<Account | null>
+  save(account: Account): Promise<void>
 }
