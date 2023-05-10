@@ -38,6 +38,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
+    "argon2": "^0.30.3",
     "axios": "^1.4.0",
     "axios-retry": "^3.4.0",
     "mongoose": "^7.1.0",

@@ -8,11 +8,13 @@ import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountRepository } from '@/domain/repositories/account'
 import { EmailAlreadyExistsError } from '../errors/email-already-exists'
 import { EmailValidator } from '@/infra/contracts'
+import { Hasher } from '@/app/contracts/hasher'
 
 export class CreateAccount implements CreateAccountUseCase {
   constructor(
     private readonly emailValidator: EmailValidator,
-    private readonly accountRepository: AccountRepository
+    private readonly accountRepository: AccountRepository,
+    private readonly hasher: Hasher
   ) {}
 
   async execute(
@@ -23,7 +25,12 @@ export class CreateAccount implements CreateAccountUseCase {
     const account = await this.accountRepository.findByEmail(dto.email)
     if (account) throw new EmailAlreadyExistsError()
 
-    await this.accountRepository.save(dto)
+    const hashedPassword = await this.hasher.hash(dto.password)
+
+    await this.accountRepository.save({
+      ...dto,
+      password: hashedPassword,
+    })
 
     return {
       name: dto.name,
