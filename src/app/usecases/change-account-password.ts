@@ -8,11 +8,14 @@ import { EmailValidator } from '@/infra/contracts'
 import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountRepository } from '@/domain/repositories/account'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'
+import { HashComparer } from '@/app/contracts/hash-comparer'
+import { WrongPasswordError } from '@/app/errors/wrong-password'
 
 export class ChangeAccountPassword implements ChangeAccountPasswordUseCase {
   constructor(
     private readonly emailValidator: EmailValidator,
-    private readonly accountRepository: AccountRepository
+    private readonly accountRepository: AccountRepository,
+    private readonly hashComparer: HashComparer
   ) {}
 
   async execute(
@@ -22,8 +25,13 @@ export class ChangeAccountPassword implements ChangeAccountPasswordUseCase {
 
     const account = await this.accountRepository.findByEmail(dto.email)
     if (!account) throw new AccountNotFoundError()
-    // TODO COMPARAR CURRENTPASSWORD COM HASH DO USUARIO.PASSWORD
-    // TODO THROW WRONGPASSWORDERROR SE NAO FOR IGUAL
+
+    const isHashValid = await this.hashComparer.compare(
+      dto.currentPassword,
+      account.password
+    )
+    if (!isHashValid) throw new WrongPasswordError()
+
     // TODO HASHEAR NOVO PASSWORD
     // TODO UPDATE PELO ID DO USUARIO, TROCANDO PASSWORD
     // TODO RETORNAR { OK: TRUE }

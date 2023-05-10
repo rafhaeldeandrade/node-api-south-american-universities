@@ -6,7 +6,9 @@ export interface ChangeAccountPasswordUseCaseInput {
   newPassword: string
 }
 
-export type ChangeAccountPasswordUseCaseOutput = void
+export type ChangeAccountPasswordUseCaseOutput = {
+  ok: boolean
+}
 
 export type ChangeAccountPasswordUseCase = UseCase<
   ChangeAccountPasswordUseCaseInput,
