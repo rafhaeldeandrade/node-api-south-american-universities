@@ -101,7 +101,7 @@ describe('Create Account Controller', () => {
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual({
       error: true,
-      message: `${paramName} param is missing.`,
+      message: `${paramName} param is missing`,
     })
   })
 
@@ -118,7 +118,7 @@ describe('Create Account Controller', () => {
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual({
       error: true,
-      message: `${paramName} param is invalid.`,
+      message: `${paramName} param is invalid`,
     })
   })
 
@@ -135,6 +135,22 @@ describe('Create Account Controller', () => {
     expect(httpResponse.body).toEqual({
       error: true,
       message: `Email already exists`,
+    })
+  })
+
+  it('should return 500 if useCase throws another Error not covered yet', async () => {
+    const { sut, createAccountUseCaseStub } = makeSut()
+    const request = makeRequest()
+    jest
+      .spyOn(createAccountUseCaseStub, 'execute')
+      .mockRejectedValueOnce(new Error())
+
+    const httpResponse = await sut.handle(request)
+
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual({
+      error: true,
+      message: `Internal Server Error`,
     })
   })
 })
