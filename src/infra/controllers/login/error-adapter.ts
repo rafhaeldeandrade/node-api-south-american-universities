@@ -1,6 +1,5 @@
 import {
   badRequest,
-  conflict,
   internalServerError,
   unauthorized,
 } from '@/infra/helpers/http'
