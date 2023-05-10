@@ -17,19 +17,37 @@ export class CreateAccount implements CreateAccountUseCase {
 
   validateDTO(dto: CreateAccountUseCaseInput) {
     const { name, email, password } = dto
+
     if (!name) throw new MissingParamError('name')
     if (!email) throw new MissingParamError('email')
     if (!password) throw new MissingParamError('password')
 
-    if (name.length < 3) throw new InvalidParamError('name')
     const isNameValid = this.validateName(name)
     if (!isNameValid) throw new InvalidParamError('name')
+
+    const isPasswordValid = this.validatePassword(password)
+    if (!isPasswordValid) throw new InvalidParamError('password')
   }
 
   validateName(name: string): boolean {
     const hasNumber = /[0-9]/.test(name)
     const hasSpecialChar = /[˜!@#$%ˆ&*()_+=`[\]\\}|\\;:"'<,>.?/]/.test(name)
 
-    return !hasNumber && !hasSpecialChar
+    return !hasNumber && !hasSpecialChar && name.length >= 3
+  }
+
+  validatePassword(password: string): boolean {
+    const hasUppercase = /[A-Z]/.test(password)
+    const hasLowercase = /[a-z]/.test(password)
+    const hasNumber = /[0-9]/.test(password)
+    const hasSpecialChar = /[.!@#$%^&*()]/.test(password)
+
+    return (
+      hasUppercase &&
+      hasLowercase &&
+      hasNumber &&
+      hasSpecialChar &&
+      password.length >= 8
+    )
   }
 }

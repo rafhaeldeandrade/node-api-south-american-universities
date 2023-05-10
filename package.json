@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "populatedb": "tsc-alias && tsnd -r tsconfig-paths/register src/main/populate-database.ts",
-    "test": "jest --passWithNoTests --silent --noStackTrace",
+    "test": "jest --passWithNoTests --noStackTrace",
     "test:unit": "npm test -- -c jest.config.unit.ts --watch",
     "test:staged": "npm test -- -c jest.config.ts --findRelatedTests",
     "prepare": "husky install"
