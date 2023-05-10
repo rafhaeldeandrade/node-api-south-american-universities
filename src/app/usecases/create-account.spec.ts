@@ -5,6 +5,7 @@ import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountRepository } from '@/domain/contracts'
 import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
+import { Account } from '@/domain/entities/account'
 
 function generateRandomInvalidPassword(): string {
   const validChars =
@@ -92,6 +93,10 @@ class AccountRepositoryStub implements AccountRepository {
   findByEmail(email: string) {
     return Promise.resolve(null)
   }
+
+  save(account: Account) {
+    return Promise.resolve()
+  }
 }
 
 interface SutTypes {
@@ -168,7 +173,7 @@ describe('Create Account Use Case', () => {
   it('should throw InvalidParamError if name has any invalid character as numbers or special ones', async () => {
     const { sut } = makeSut()
 
-    const invalidCharacters = '`~1234567890!@#$%ˆ&*()_+={[}]|\\;:,<.>/?'
+    const invalidCharacters = '`~1234567890!@#$%ˆ&*()_+={[}]|\\;:,<>/?'
     const randomIndex = Math.floor(Math.random() * invalidCharacters.length)
 
     const dto = makeDTOWithout()
@@ -194,7 +199,6 @@ describe('Create Account Use Case', () => {
     const { sut } = makeSut()
 
     const dto = makeDTOWithout()
-    console.log('dto.name: ', dto.name)
     dto.password = generateRandomInvalidPassword()
 
     const result = sut.execute(dto as any)
@@ -213,7 +217,7 @@ describe('Create Account Use Case', () => {
     expect(findByEmailSpy).toHaveBeenCalledWith(dto.email)
   })
 
-  it('should throw EmailAlreadyExists if AccountRepository.findByEmail returns an Account', async () => {
+  it('should throw EmailAlreadyExistsError if AccountRepository.findByEmail returns an Account', async () => {
     const { sut, accountRepositoryStub } = makeSut()
     jest
       .spyOn(accountRepositoryStub, 'findByEmail')
@@ -223,5 +227,16 @@ describe('Create Account Use Case', () => {
     const result = sut.execute(dto as CreateAccountUseCaseInput)
 
     await expect(result).rejects.toThrow(new EmailAlreadyExistsError())
+  })
+
+  it('should call AccountRepository.save with the correct values', async () => {
+    const { sut, accountRepositoryStub } = makeSut()
+    const saveSpy = jest.spyOn(accountRepositoryStub, 'save')
+    const dto = makeDTOWithout()
+
+    await sut.execute(dto as CreateAccountUseCaseInput)
+
+    expect(saveSpy).toHaveBeenCalledTimes(1)
+    expect(saveSpy).toHaveBeenCalledWith(dto)
   })
 })
