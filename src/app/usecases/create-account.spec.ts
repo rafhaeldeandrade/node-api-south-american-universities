@@ -119,6 +119,10 @@ class AccountRepositoryStub implements AccountRepository {
   save(account: Account) {
     return Promise.resolve(makeFakeAccount())
   }
+
+  findByIdAndUpdateAccessToken() {
+    return Promise.resolve()
+  }
 }
 
 class HasherStub implements Hasher {
@@ -343,6 +347,30 @@ describe('Create Account Use Case', () => {
     expect(encryptSpy).toHaveBeenCalledWith({
       id: fakeUuid,
     })
+  })
+
+  it('should call AccountRepository.findByIdAndUpdateAccessToken', async () => {
+    const { sut, uuidGeneratorStub, accountRepositoryStub, encrypterStub } =
+      makeSut()
+    const fakeUuid = faker.datatype.uuid()
+    jest.spyOn(uuidGeneratorStub, 'generateUUID').mockReturnValueOnce(fakeUuid)
+    const fakeEncryptedUserId = faker.datatype.uuid()
+    jest
+      .spyOn(encrypterStub, 'encrypt')
+      .mockReturnValueOnce(fakeEncryptedUserId)
+    const findByIdAndUpdateAccessTokenSpy = jest.spyOn(
+      accountRepositoryStub,
+      'findByIdAndUpdateAccessToken'
+    )
+    const dto = makeDTOWithout()
+
+    await sut.execute(dto as CreateAccountUseCaseInput)
+
+    expect(findByIdAndUpdateAccessTokenSpy).toHaveBeenCalledTimes(1)
+    expect(findByIdAndUpdateAccessTokenSpy).toHaveBeenCalledWith(
+      fakeUuid,
+      fakeEncryptedUserId
+    )
   })
 
   it('should return name and email on success', async () => {
