@@ -7,9 +7,13 @@ import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountRepository } from '@/domain/contracts'
 import { EmailAlreadyExistsError } from '../errors/email-already-exists'
+import { EmailValidator } from '@/infra/contracts'
 
 export class CreateAccount implements CreateAccountUseCase {
-  constructor(private readonly accountRepository: AccountRepository) {}
+  constructor(
+    private readonly emailValidator: EmailValidator,
+    private readonly accountRepository: AccountRepository
+  ) {}
 
   async execute(
     dto: CreateAccountUseCaseInput
@@ -36,6 +40,9 @@ export class CreateAccount implements CreateAccountUseCase {
 
     const isNameValid = this.validateName(name)
     if (!isNameValid) throw new InvalidParamError('name')
+
+    const isEmailValid = this.emailValidator.isValid(email)
+    if (!isEmailValid) throw new InvalidParamError('email')
 
     const isPasswordValid = this.validatePassword(password)
     if (!isPasswordValid) throw new InvalidParamError('password')
