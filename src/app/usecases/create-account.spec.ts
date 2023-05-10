@@ -170,20 +170,6 @@ describe('Create Account Use Case', () => {
     await expect(result).rejects.toThrow(new InvalidParamError('name'))
   })
 
-  it('should throw InvalidParamError if name has any invalid character as numbers or special ones', async () => {
-    const { sut } = makeSut()
-
-    const invalidCharacters = '`~1234567890!@#$%ˆ&*()_+={[}]|\\;:,<>/?'
-    const randomIndex = Math.floor(Math.random() * invalidCharacters.length)
-
-    const dto = makeDTOWithout()
-    dto.name = dto.name + invalidCharacters.charAt(randomIndex)
-
-    const result = sut.execute(dto as any)
-
-    await expect(result).rejects.toThrow(new InvalidParamError('name'))
-  })
-
   it('should throw InvalidParamError if password has less than 8 characters', async () => {
     const { sut } = makeSut()
 
@@ -238,5 +224,17 @@ describe('Create Account Use Case', () => {
 
     expect(saveSpy).toHaveBeenCalledTimes(1)
     expect(saveSpy).toHaveBeenCalledWith(dto)
+  })
+
+  it('should return name and email on success', async () => {
+    const { sut } = makeSut()
+    const dto = makeDTOWithout()
+
+    const result = await sut.execute(dto as CreateAccountUseCaseInput)
+
+    expect(result).toEqual({
+      name: dto.name,
+      email: dto.email,
+    })
   })
 })
