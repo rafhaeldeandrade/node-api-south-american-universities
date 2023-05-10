@@ -31,21 +31,16 @@ export class CreateAccount implements CreateAccountUseCase {
 
     const userId = this.uuidGenerator.generateUUID()
     const hashedPassword = await this.hasher.hash(dto.password)
+    const accessToken = this.encrypter.encrypt({
+      id: userId,
+    })
 
     await this.accountRepository.save({
       ...dto,
       id: userId,
       password: hashedPassword,
+      accessToken,
     })
-
-    const accessToken = this.encrypter.encrypt({
-      id: userId,
-    })
-
-    await this.accountRepository.findByIdAndUpdateAccessToken(
-      userId,
-      accessToken
-    )
 
     return {
       name: dto.name,
