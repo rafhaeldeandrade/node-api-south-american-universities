@@ -5,6 +5,7 @@ import {
   CreateAccountUseCase,
   CreateAccountUseCaseOutput,
 } from '@/domain/usecases/create-account'
+import { MissingParamError } from '@/app/errors/missing-param'
 
 class CreateAccountUseCaseStub implements CreateAccountUseCase {
   async execute() {
@@ -44,6 +45,10 @@ function makeUseCaseReturn(): CreateAccountUseCaseOutput {
 }
 
 describe('Create Account Controller', () => {
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   it('should call CreateAccountUseCase.execute with the correct values', async () => {
     const { sut, createAccountUseCaseStub } = makeSut()
     const executeSpy = jest.spyOn(createAccountUseCaseStub, 'execute')
@@ -79,5 +84,22 @@ describe('Create Account Controller', () => {
 
     expect(httpResponse.statusCode).toBe(201)
     expect(httpResponse.body).toEqual(fakeUseCaseReturn)
+  })
+
+  it('should return 400 if useCase throws MissingParamError', async () => {
+    const { sut, createAccountUseCaseStub } = makeSut()
+    const request = makeRequest()
+    const paramName = faker.internet.userName()
+    jest
+      .spyOn(createAccountUseCaseStub, 'execute')
+      .mockRejectedValueOnce(new MissingParamError(paramName))
+
+    const httpResponse = await sut.handle(request)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual({
+      error: true,
+      message: `${paramName} param is missing.`,
+    })
   })
 })
