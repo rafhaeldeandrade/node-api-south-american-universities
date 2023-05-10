@@ -5,18 +5,23 @@ import {
 } from '@/domain/usecases/change-account-password'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { EmailValidator } from '@/infra/contracts'
-import { InvalidParamError } from '../errors/invalid-param'
+import { InvalidParamError } from '@/app/errors/invalid-param'
+import { AccountRepository } from '@/domain/repositories/account'
+import { AccountNotFoundError } from '@/app/errors/account-not-found'
 
 export class ChangeAccountPassword implements ChangeAccountPasswordUseCase {
-  constructor(private readonly emailValidator: EmailValidator) {}
+  constructor(
+    private readonly emailValidator: EmailValidator,
+    private readonly accountRepository: AccountRepository
+  ) {}
 
   async execute(
     dto: ChangeAccountPasswordUseCaseInput
   ): Promise<ChangeAccountPasswordUseCaseOutput> {
     this.validateDTO(dto)
 
-    // TODO BUSCAR USUARIO POR EMAIL
-    // TODO THROW ACCOUNTNOTFOUNDERROR SE NAO ACHAR
+    const account = await this.accountRepository.findByEmail(dto.email)
+    if (!account) throw new AccountNotFoundError()
     // TODO COMPARAR CURRENTPASSWORD COM HASH DO USUARIO.PASSWORD
     // TODO THROW WRONGPASSWORDERROR SE NAO FOR IGUAL
     // TODO HASHEAR NOVO PASSWORD
