@@ -5,12 +5,17 @@ import {
 } from '@/domain/usecases/create-account'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
+import { AccountRepository } from '@/domain/contracts'
 
 export class CreateAccount implements CreateAccountUseCase {
+  constructor(private readonly accountRepository: AccountRepository) {}
+
   async execute(
     dto: CreateAccountUseCaseInput
   ): Promise<CreateAccountUseCaseOutput> {
     this.validateDTO(dto)
+
+    this.accountRepository.findByEmail(dto.email)
 
     return {} as unknown as CreateAccountUseCaseOutput
   }
@@ -31,7 +36,7 @@ export class CreateAccount implements CreateAccountUseCase {
 
   validateName(name: string): boolean {
     const hasNumber = /[0-9]/.test(name)
-    const hasSpecialChar = /[˜!@#$%ˆ&*()_+=`[\]\\}|\\;:"'<,>.?/]/.test(name)
+    const hasSpecialChar = /[˜!@#$%ˆ&*()_+=`[\]\\}|\\;:"'<,>?/]/.test(name)
 
     return !hasNumber && !hasSpecialChar && name.length >= 3
   }
