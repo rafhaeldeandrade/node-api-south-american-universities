@@ -3,6 +3,8 @@ import { CreateAccountUseCaseInput } from '@/domain/usecases/create-account'
 import { faker } from '@faker-js/faker'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
+import { AccountRepository } from '@/domain/contracts'
+import { Account } from '@/domain/entities/account'
 
 function generateRandomInvalidPassword(): string {
   const validChars =
@@ -77,13 +79,30 @@ function shuffleString(str: string): string {
   return shuffledArray.join('')
 }
 
+function makeFakeAccount() {
+  return {
+    name: faker.name.fullName(),
+    email: faker.internet.email(),
+    password: generateRandomValidPassword(),
+    accessToken: faker.datatype.uuid(),
+  }
+}
+
+class AccountRepositoryStub implements AccountRepository {
+  findByEmail(email: string) {
+    return Promise.resolve(null)
+  }
+}
+
 interface SutTypes {
   sut: CreateAccount
+  accountRepositoryStub: AccountRepository
 }
 
 function makeSut(): SutTypes {
-  const sut = new CreateAccount()
-  return { sut }
+  const accountRepositoryStub = new AccountRepositoryStub()
+  const sut = new CreateAccount(accountRepositoryStub)
+  return { sut, accountRepositoryStub }
 }
 
 function makeDTOWithout(
@@ -171,11 +190,22 @@ describe('Create Account Use Case', () => {
     const { sut } = makeSut()
 
     const dto = makeDTOWithout()
+    console.log('dto.name: ', dto.name)
     dto.password = generateRandomInvalidPassword()
-    console.log(dto.password)
 
     const result = sut.execute(dto as any)
 
     await expect(result).rejects.toThrow(new InvalidParamError('password'))
+  })
+
+  it('should call AccountRepository.findByEmail with the correct value', async () => {
+    const { sut, accountRepositoryStub } = makeSut()
+    const findByEmailSpy = jest.spyOn(accountRepositoryStub, 'findByEmail')
+    const dto = makeDTOWithout()
+
+    await sut.execute(dto as CreateAccountUseCaseInput)
+
+    expect(findByEmailSpy).toHaveBeenCalledTimes(1)
+    expect(findByEmailSpy).toHaveBeenCalledWith(dto.email)
   })
 })
