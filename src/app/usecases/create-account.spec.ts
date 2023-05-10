@@ -4,7 +4,7 @@ import { faker } from '@faker-js/faker'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountRepository } from '@/domain/contracts'
-import { Account } from '@/domain/entities/account'
+import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
 
 function generateRandomInvalidPassword(): string {
   const validChars =
@@ -120,6 +120,10 @@ function makeDTOWithout(
 }
 
 describe('Create Account Use Case', () => {
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   it('should throw MissingParamError if name is not provided', async () => {
     const { sut } = makeSut()
 
@@ -207,5 +211,17 @@ describe('Create Account Use Case', () => {
 
     expect(findByEmailSpy).toHaveBeenCalledTimes(1)
     expect(findByEmailSpy).toHaveBeenCalledWith(dto.email)
+  })
+
+  it('should throw EmailAlreadyExists if AccountRepository.findByEmail returns an Account', async () => {
+    const { sut, accountRepositoryStub } = makeSut()
+    jest
+      .spyOn(accountRepositoryStub, 'findByEmail')
+      .mockResolvedValueOnce(makeFakeAccount())
+    const dto = makeDTOWithout()
+
+    const result = sut.execute(dto as CreateAccountUseCaseInput)
+
+    await expect(result).rejects.toThrow(new EmailAlreadyExistsError())
   })
 })
