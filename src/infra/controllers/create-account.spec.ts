@@ -1,7 +1,10 @@
 import { faker } from '@faker-js/faker'
 import { CreateAccountController } from '@/infra/controllers/create-account'
 import { HttpRequest } from '@/infra/contracts'
-import { CreateAccountUseCase } from '@/domain/usecases/create-account'
+import {
+  CreateAccountUseCase,
+  CreateAccountUseCaseOutput,
+} from '@/domain/usecases/create-account'
 
 class CreateAccountUseCaseStub implements CreateAccountUseCase {
   async execute() {
@@ -33,6 +36,13 @@ function makeRequest(): HttpRequest {
   }
 }
 
+function makeUseCaseReturn(): CreateAccountUseCaseOutput {
+  return {
+    name: faker.name.fullName(),
+    email: faker.internet.email(),
+  }
+}
+
 describe('Create Account Controller', () => {
   it('should call CreateAccountUseCase.execute with the correct values', async () => {
     const { sut, createAccountUseCaseStub } = makeSut()
@@ -55,5 +65,19 @@ describe('Create Account Controller', () => {
 
     expect(executeSpy).toHaveBeenCalledTimes(1)
     expect(executeSpy).toHaveBeenCalledWith({})
+  })
+
+  it('should return 201 with the correct values on success', async () => {
+    const { sut, createAccountUseCaseStub } = makeSut()
+    const request = makeRequest()
+    const fakeUseCaseReturn = makeUseCaseReturn()
+    jest
+      .spyOn(createAccountUseCaseStub, 'execute')
+      .mockResolvedValueOnce(fakeUseCaseReturn)
+
+    const httpResponse = await sut.handle(request)
+
+    expect(httpResponse.statusCode).toBe(201)
+    expect(httpResponse.body).toEqual(fakeUseCaseReturn)
   })
 })
