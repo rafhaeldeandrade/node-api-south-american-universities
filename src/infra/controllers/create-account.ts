@@ -6,8 +6,11 @@ export class CreateAccountController implements Controller {
 
   async handle(request: HttpRequest): Promise<HttpResponse> {
     const body = request.body || {}
-    await this.useCase.execute(body)
+    const result = await this.useCase.execute(body)
 
-    return {} as unknown as HttpResponse
+    return {
+      statusCode: 201,
+      body: result,
+    }
   }
 }

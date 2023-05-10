@@ -6,7 +6,7 @@ interface CreateAccountUseCaseInput {
   password: string
 }
 
-interface CreateAccountUseCaseOutput {
+export interface CreateAccountUseCaseOutput {
   name: string
   email: string
 }
