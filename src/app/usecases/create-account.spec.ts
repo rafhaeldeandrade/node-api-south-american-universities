@@ -7,6 +7,7 @@ import { AccountRepository } from '@/domain/repositories/account'
 import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
 import { Account } from '@/domain/entities/account'
 import { EmailValidator } from '@/infra/contracts'
+import { Hasher } from '@/app/contracts/hasher'
 
 function generateRandomInvalidEmail(): string {
   const invalidTLDs = ['.invalid', '.test', '.example', '.localhost']
@@ -117,17 +118,29 @@ class AccountRepositoryStub implements AccountRepository {
   }
 }
 
+class HasherStub implements Hasher {
+  hash(value: string) {
+    return Promise.resolve('hashed' + value)
+  }
+}
+
 interface SutTypes {
   sut: CreateAccount
   emailValidatorStub: EmailValidator
   accountRepositoryStub: AccountRepository
+  hasherStub: Hasher
 }
 
 function makeSut(): SutTypes {
   const emailValidatorStub = new EmailValidatorStub()
   const accountRepositoryStub = new AccountRepositoryStub()
-  const sut = new CreateAccount(emailValidatorStub, accountRepositoryStub)
-  return { sut, emailValidatorStub, accountRepositoryStub }
+  const hasherStub = new HasherStub()
+  const sut = new CreateAccount(
+    emailValidatorStub,
+    accountRepositoryStub,
+    hasherStub
+  )
+  return { sut, emailValidatorStub, accountRepositoryStub, hasherStub }
 }
 
 function makeDTOWithout(
@@ -197,7 +210,7 @@ describe('Create Account Use Case', () => {
     const dto = makeDTOWithout()
     dto.email = generateRandomInvalidEmail()
 
-    const result = sut.execute(dto as any)
+    const result = sut.execute(dto as CreateAccountUseCaseInput)
 
     await expect(result).rejects.toThrow(new InvalidParamError('email'))
   })
@@ -208,7 +221,7 @@ describe('Create Account Use Case', () => {
     const dto = makeDTOWithout()
     dto.password = generateRandomInvalidPassword().substring(0, 7)
 
-    const result = sut.execute(dto as any)
+    const result = sut.execute(dto as CreateAccountUseCaseInput)
 
     await expect(result).rejects.toThrow(new InvalidParamError('password'))
   })
@@ -219,7 +232,7 @@ describe('Create Account Use Case', () => {
     const dto = makeDTOWithout()
     dto.password = generateRandomInvalidPassword()
 
-    const result = sut.execute(dto as any)
+    const result = sut.execute(dto as CreateAccountUseCaseInput)
 
     await expect(result).rejects.toThrow(new InvalidParamError('password'))
   })
@@ -247,15 +260,31 @@ describe('Create Account Use Case', () => {
     await expect(result).rejects.toThrow(new EmailAlreadyExistsError())
   })
 
+  it('should call Hasher.hash with the correct value', async () => {
+    const { sut, hasherStub } = makeSut()
+    const hashSpy = jest.spyOn(hasherStub, 'hash')
+    const dto = makeDTOWithout()
+
+    await sut.execute(dto as CreateAccountUseCaseInput)
+
+    expect(hashSpy).toHaveBeenCalledTimes(1)
+    expect(hashSpy).toHaveBeenCalledWith(dto.password)
+  })
+
   it('should call AccountRepository.save with the correct values', async () => {
-    const { sut, accountRepositoryStub } = makeSut()
+    const { sut, accountRepositoryStub, hasherStub } = makeSut()
     const saveSpy = jest.spyOn(accountRepositoryStub, 'save')
+    const fakeHashedPassword = faker.datatype.uuid()
+    jest.spyOn(hasherStub, 'hash').mockResolvedValueOnce(fakeHashedPassword)
     const dto = makeDTOWithout()
 
     await sut.execute(dto as CreateAccountUseCaseInput)
 
     expect(saveSpy).toHaveBeenCalledTimes(1)
-    expect(saveSpy).toHaveBeenCalledWith(dto)
+    expect(saveSpy).toHaveBeenCalledWith({
+      ...dto,
+      password: fakeHashedPassword,
+    })
   })
 
   it('should return name and email on success', async () => {
