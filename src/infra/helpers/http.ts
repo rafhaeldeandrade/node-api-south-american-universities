@@ -22,6 +22,23 @@ export function created(data: any): HttpResponse {
   }
 }
 
+export function unauthorized(): HttpResponse {
+  return {
+    statusCode: 401,
+    body: {
+      error: true,
+      message: 'Wrong credentials',
+    },
+  }
+}
+
+export function ok(data: any): HttpResponse {
+  return {
+    statusCode: 200,
+    body: data,
+  }
+}
+
 export function conflict(error: EmailAlreadyExistsError): HttpResponse {
   return {
     statusCode: 409,
