@@ -314,26 +314,6 @@ describe('Create Account Use Case', () => {
     expect(hashSpy).toHaveBeenCalledWith(dto.password)
   })
 
-  it('should call AccountRepository.save with the correct values', async () => {
-    const { sut, uuidGeneratorStub, accountRepositoryStub, hasherStub } =
-      makeSut()
-    const fakeUuid = faker.datatype.uuid()
-    jest.spyOn(uuidGeneratorStub, 'generateUUID').mockReturnValueOnce(fakeUuid)
-    const saveSpy = jest.spyOn(accountRepositoryStub, 'save')
-    const fakeHashedPassword = faker.datatype.uuid()
-    jest.spyOn(hasherStub, 'hash').mockResolvedValueOnce(fakeHashedPassword)
-    const dto = makeDTOWithout()
-
-    await sut.execute(dto as CreateAccountUseCaseInput)
-
-    expect(saveSpy).toHaveBeenCalledTimes(1)
-    expect(saveSpy).toHaveBeenCalledWith({
-      ...dto,
-      id: fakeUuid,
-      password: fakeHashedPassword,
-    })
-  })
-
   it('should call Encrypter.encrypt with the correct value', async () => {
     const { sut, encrypterStub, uuidGeneratorStub } = makeSut()
     const encryptSpy = jest.spyOn(encrypterStub, 'encrypt')
@@ -349,28 +329,32 @@ describe('Create Account Use Case', () => {
     })
   })
 
-  it('should call AccountRepository.findByIdAndUpdateAccessToken', async () => {
-    const { sut, uuidGeneratorStub, accountRepositoryStub, encrypterStub } =
-      makeSut()
+  it('should call AccountRepository.save with the correct values', async () => {
+    const {
+      sut,
+      uuidGeneratorStub,
+      accountRepositoryStub,
+      hasherStub,
+      encrypterStub,
+    } = makeSut()
     const fakeUuid = faker.datatype.uuid()
     jest.spyOn(uuidGeneratorStub, 'generateUUID').mockReturnValueOnce(fakeUuid)
-    const fakeEncryptedUserId = faker.datatype.uuid()
-    jest
-      .spyOn(encrypterStub, 'encrypt')
-      .mockReturnValueOnce(fakeEncryptedUserId)
-    const findByIdAndUpdateAccessTokenSpy = jest.spyOn(
-      accountRepositoryStub,
-      'findByIdAndUpdateAccessToken'
-    )
+    const fakeAccessToken = faker.datatype.uuid()
+    jest.spyOn(encrypterStub, 'encrypt').mockReturnValueOnce(fakeAccessToken)
+    const saveSpy = jest.spyOn(accountRepositoryStub, 'save')
+    const fakeHashedPassword = faker.datatype.uuid()
+    jest.spyOn(hasherStub, 'hash').mockResolvedValueOnce(fakeHashedPassword)
     const dto = makeDTOWithout()
 
     await sut.execute(dto as CreateAccountUseCaseInput)
 
-    expect(findByIdAndUpdateAccessTokenSpy).toHaveBeenCalledTimes(1)
-    expect(findByIdAndUpdateAccessTokenSpy).toHaveBeenCalledWith(
-      fakeUuid,
-      fakeEncryptedUserId
-    )
+    expect(saveSpy).toHaveBeenCalledTimes(1)
+    expect(saveSpy).toHaveBeenCalledWith({
+      ...dto,
+      id: fakeUuid,
+      password: fakeHashedPassword,
+      accessToken: fakeAccessToken,
+    })
   })
 
   it('should return name and email on success', async () => {
