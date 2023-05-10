@@ -5,13 +5,16 @@
   "main": "index.js",
   "scripts": {
     "populatedb": "tsc-alias && tsnd -r tsconfig-paths/register src/main/populate-database.ts",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --passWithNoTests --silent --noStackTrace",
+    "test:unit": "npm test -- -c jest.config.unit.ts --watch",
+    "test:staged": "npm test -- -c jest.config.ts --findRelatedTests",
     "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@faker-js/faker": "^7.6.0",
     "@types/jest": "^29.5.1",
     "@types/node": "^20.1.1",
     "@types/node-cron": "^3.0.7",
@@ -28,15 +31,15 @@
     "prettier": "^2.8.8",
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.1",
+    "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.6",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
     "axios": "^1.4.0",
     "axios-retry": "^3.4.0",
     "mongoose": "^7.1.0",
-    "node-cron": "^3.0.2",
-    "ts-node-dev": "^2.0.0",
-    "tsc-alias": "^1.8.6",
-    "tsconfig-paths": "^4.2.0"
+    "node-cron": "^3.0.2"
   }
 }
