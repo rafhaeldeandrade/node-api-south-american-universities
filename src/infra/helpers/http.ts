@@ -1,7 +1,10 @@
 import { HttpResponse } from '@/infra/contracts'
 import { MissingParamError } from '@/app/errors/missing-param'
+import { InvalidParamError } from '@/app/errors/invalid-param'
 
-export function badRequest(error: MissingParamError): HttpResponse {
+export function badRequest(
+  error: MissingParamError | InvalidParamError
+): HttpResponse {
   return {
     statusCode: 400,
     body: {

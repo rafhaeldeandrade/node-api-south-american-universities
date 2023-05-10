@@ -1,3 +1,4 @@
+import { InvalidParamError } from '@/app/errors/invalid-param'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { CreateAccountUseCase } from '@/domain/usecases/create-account'
 import { Controller, HttpRequest, HttpResponse } from '@/infra/contracts'
@@ -13,7 +14,10 @@ export class CreateAccountController implements Controller {
 
       return created(result)
     } catch (e: unknown) {
-      if (e instanceof MissingParamError) return badRequest(e)
+      if (e instanceof MissingParamError || e instanceof InvalidParamError) {
+        return badRequest(e)
+      }
+
       return {
         statusCode: 500,
         body: {
