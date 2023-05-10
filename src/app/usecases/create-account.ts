@@ -6,6 +6,7 @@ import {
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountRepository } from '@/domain/contracts'
+import { EmailAlreadyExistsError } from '../errors/email-already-exists'
 
 export class CreateAccount implements CreateAccountUseCase {
   constructor(private readonly accountRepository: AccountRepository) {}
@@ -15,7 +16,8 @@ export class CreateAccount implements CreateAccountUseCase {
   ): Promise<CreateAccountUseCaseOutput> {
     this.validateDTO(dto)
 
-    this.accountRepository.findByEmail(dto.email)
+    const account = await this.accountRepository.findByEmail(dto.email)
+    if (account) throw new EmailAlreadyExistsError()
 
     return {} as unknown as CreateAccountUseCaseOutput
   }
