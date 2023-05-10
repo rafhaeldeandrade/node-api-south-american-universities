@@ -2,6 +2,7 @@ import { CreateAccount } from '@/app/usecases/create-account'
 import { CreateAccountUseCaseInput } from '@/domain/usecases/create-account'
 import { faker } from '@faker-js/faker'
 import { MissingParamError } from '@/app/errors/missing-param'
+import { InvalidParamError } from '@/app/errors/invalid-param'
 
 function generateRandomValidPassword(): string {
   const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -94,5 +95,30 @@ describe('Create Account Use Case', () => {
     const result = sut.execute(dto as any)
 
     await expect(result).rejects.toThrow(new MissingParamError('password'))
+  })
+
+  it('should throw InvalidParamError if name has less than 3 characters', async () => {
+    const { sut } = makeSut()
+
+    const dto = makeDTOWithout()
+    dto.name = 'IA'
+
+    const result = sut.execute(dto as any)
+
+    await expect(result).rejects.toThrow(new InvalidParamError('name'))
+  })
+
+  it('should throw InvalidParamError if name has any invalid character as numbers or special ones', async () => {
+    const { sut } = makeSut()
+
+    const invalidCharacters = '`~1234567890!@#$%ˆ&*()_+={[}]|\\;:,<.>/?'
+    const randomIndex = Math.floor(Math.random() * invalidCharacters.length)
+
+    const dto = makeDTOWithout()
+    dto.name = dto.name + invalidCharacters.charAt(randomIndex)
+
+    const result = sut.execute(dto as any)
+
+    await expect(result).rejects.toThrow(new InvalidParamError('name'))
   })
 })
