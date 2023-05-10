@@ -4,6 +4,40 @@ import { faker } from '@faker-js/faker'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
 
+function generateRandomInvalidPassword(): string {
+  const validChars =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!@#$%^&*()'
+
+  const passwordLength = 8
+
+  let password = ''
+  let charSet = validChars
+
+  const constraintToInvalidate = Math.floor(Math.random() * 4)
+  switch (constraintToInvalidate) {
+    case 0:
+      charSet = charSet.replaceAll(/[A-Z]/g, '')
+      break
+    case 1:
+      charSet = charSet.replaceAll(/[a-z]/g, '')
+      break
+    case 2:
+      charSet = charSet.replaceAll(/[0-9]/g, '')
+      break
+    case 3:
+      charSet = charSet.replaceAll(/[.!@#$%^&*()]/g, '')
+      break
+    default:
+      break
+  }
+
+  for (let i = 0; i < passwordLength; i++) {
+    password += getRandomChar(charSet)
+  }
+
+  return password
+}
+
 function generateRandomValidPassword(): string {
   const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz'
@@ -120,5 +154,28 @@ describe('Create Account Use Case', () => {
     const result = sut.execute(dto as any)
 
     await expect(result).rejects.toThrow(new InvalidParamError('name'))
+  })
+
+  it('should throw InvalidParamError if password has less than 8 characters', async () => {
+    const { sut } = makeSut()
+
+    const dto = makeDTOWithout()
+    dto.password = generateRandomInvalidPassword().substring(0, 7)
+
+    const result = sut.execute(dto as any)
+
+    await expect(result).rejects.toThrow(new InvalidParamError('password'))
+  })
+
+  it('should throw InvalidParamError if password doesnt have at least 1 uppercase character, 1 lowercase character and 1 special character', async () => {
+    const { sut } = makeSut()
+
+    const dto = makeDTOWithout()
+    dto.password = generateRandomInvalidPassword()
+    console.log(dto.password)
+
+    const result = sut.execute(dto as any)
+
+    await expect(result).rejects.toThrow(new InvalidParamError('password'))
   })
 })
