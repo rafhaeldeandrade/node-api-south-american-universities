@@ -44,4 +44,16 @@ describe('Create Account Controller', () => {
     expect(executeSpy).toHaveBeenCalledTimes(1)
     expect(executeSpy).toHaveBeenCalledWith(request.body)
   })
+
+  it('should call CreateAccountUseCase.execute with the correct values when request has no body', async () => {
+    const { sut, createAccountUseCaseStub } = makeSut()
+    const executeSpy = jest.spyOn(createAccountUseCaseStub, 'execute')
+    const request = makeRequest()
+    const requestWithNoBody = { ...request, body: undefined }
+
+    await sut.handle(requestWithNoBody)
+
+    expect(executeSpy).toHaveBeenCalledTimes(1)
+    expect(executeSpy).toHaveBeenCalledWith({})
+  })
 })
