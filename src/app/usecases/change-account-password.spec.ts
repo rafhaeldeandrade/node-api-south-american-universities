@@ -3,6 +3,9 @@ import { ChangeAccountPassword } from './change-account-password'
 import { ChangeAccountPasswordUseCaseInput } from '@/domain/usecases/change-account-password'
 import { faker } from '@faker-js/faker'
 import { MissingParamError } from '../errors/missing-param'
+import { AccountRepository } from '@/domain/repositories/account'
+import { Account } from '@/domain/entities/account'
+import { AccountNotFoundError } from '@/app/errors/account-not-found'
 
 function generateRandomValidPassword(): string {
   const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -49,15 +52,44 @@ class EmailValidatorStub implements EmailValidator {
   }
 }
 
+function makeFakeAccount() {
+  return {
+    id: faker.datatype.uuid(),
+    name: faker.name.fullName(),
+    email: faker.internet.email(),
+    password: generateRandomValidPassword(),
+    accessToken: faker.datatype.uuid(),
+  }
+}
+
+class AccountRepositoryStub implements AccountRepository {
+  findByEmail(email: string) {
+    return Promise.resolve(makeFakeAccount())
+  }
+
+  save(account: Account) {
+    return Promise.resolve(makeFakeAccount())
+  }
+
+  findByIdAndUpdateAccessToken() {
+    return Promise.resolve()
+  }
+}
+
 interface SutTypes {
   sut: ChangeAccountPassword
   emailValidatorStub: EmailValidator
+  accountRepositoryStub: AccountRepository
 }
 
 function makeSut(): SutTypes {
   const emailValidatorStub = new EmailValidatorStub()
-  const sut = new ChangeAccountPassword(emailValidatorStub)
-  return { sut, emailValidatorStub }
+  const accountRepositoryStub = new AccountRepositoryStub()
+  const sut = new ChangeAccountPassword(
+    emailValidatorStub,
+    accountRepositoryStub
+  )
+  return { sut, emailValidatorStub, accountRepositoryStub }
 }
 
 function makeDTOWithout(
@@ -105,5 +137,26 @@ describe('Change Account Password Use Case', () => {
     const result = sut.execute(dto as any)
 
     await expect(result).rejects.toThrow(new MissingParamError('newPassword'))
+  })
+
+  it('should call AccountRepository.findByEmail with the correct value', async () => {
+    const { sut, accountRepositoryStub } = makeSut()
+    const findByEmailSpy = jest.spyOn(accountRepositoryStub, 'findByEmail')
+    const dto = makeDTOWithout()
+
+    await sut.execute(dto as ChangeAccountPasswordUseCaseInput)
+
+    expect(findByEmailSpy).toHaveBeenCalledTimes(1)
+    expect(findByEmailSpy).toHaveBeenCalledWith(dto.email)
+  })
+
+  it('should throw AccountNotFoundError if AccountRepository.findByEmail returns null', async () => {
+    const { sut, accountRepositoryStub } = makeSut()
+    jest.spyOn(accountRepositoryStub, 'findByEmail').mockResolvedValueOnce(null)
+    const dto = makeDTOWithout()
+
+    const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
+
+    await expect(result).rejects.toThrow(new AccountNotFoundError())
   })
 })
