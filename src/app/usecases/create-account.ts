@@ -38,9 +38,14 @@ export class CreateAccount implements CreateAccountUseCase {
       password: hashedPassword,
     })
 
-    this.encrypter.encrypt({
+    const accessToken = this.encrypter.encrypt({
       id: userId,
     })
+
+    await this.accountRepository.findByIdAndUpdateAccessToken(
+      userId,
+      accessToken
+    )
 
     return {
       name: dto.name,
