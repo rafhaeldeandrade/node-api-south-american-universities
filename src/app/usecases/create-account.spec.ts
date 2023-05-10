@@ -6,6 +6,18 @@ import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountRepository } from '@/domain/contracts'
 import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
 import { Account } from '@/domain/entities/account'
+import { EmailValidator } from '@/infra/contracts'
+
+function generateRandomInvalidEmail(): string {
+  const invalidTLDs = ['.invalid', '.test', '.example', '.localhost']
+
+  const username = faker.internet.userName()
+  const domain = 'invalid' // Common invalid domain
+  const randomTLDIndex = Math.floor(Math.random() * invalidTLDs.length)
+  const tld = invalidTLDs[randomTLDIndex]
+
+  return `${username}@${domain}${tld}`
+}
 
 function generateRandomInvalidPassword(): string {
   const validChars =
@@ -89,6 +101,12 @@ function makeFakeAccount() {
   }
 }
 
+class EmailValidatorStub implements EmailValidator {
+  isValid(email: string): boolean {
+    return true
+  }
+}
+
 class AccountRepositoryStub implements AccountRepository {
   findByEmail(email: string) {
     return Promise.resolve(null)
@@ -101,13 +119,15 @@ class AccountRepositoryStub implements AccountRepository {
 
 interface SutTypes {
   sut: CreateAccount
+  emailValidatorStub: EmailValidator
   accountRepositoryStub: AccountRepository
 }
 
 function makeSut(): SutTypes {
+  const emailValidatorStub = new EmailValidatorStub()
   const accountRepositoryStub = new AccountRepositoryStub()
-  const sut = new CreateAccount(accountRepositoryStub)
-  return { sut, accountRepositoryStub }
+  const sut = new CreateAccount(emailValidatorStub, accountRepositoryStub)
+  return { sut, emailValidatorStub, accountRepositoryStub }
 }
 
 function makeDTOWithout(
@@ -168,6 +188,18 @@ describe('Create Account Use Case', () => {
     const result = sut.execute(dto as any)
 
     await expect(result).rejects.toThrow(new InvalidParamError('name'))
+  })
+
+  it('should throw InvalidParamError if email is invalid', async () => {
+    const { sut, emailValidatorStub } = makeSut()
+    jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
+
+    const dto = makeDTOWithout()
+    dto.email = generateRandomInvalidEmail()
+
+    const result = sut.execute(dto as any)
+
+    await expect(result).rejects.toThrow(new InvalidParamError('email'))
   })
 
   it('should throw InvalidParamError if password has less than 8 characters', async () => {
