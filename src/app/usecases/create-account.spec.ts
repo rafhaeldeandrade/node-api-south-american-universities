@@ -85,4 +85,14 @@ describe('Create Account Use Case', () => {
 
     await expect(result).rejects.toThrow(new MissingParamError('email'))
   })
+
+  it('should throw MissingParamError if password is not provided', async () => {
+    const { sut } = makeSut()
+
+    const dto = makeDTOWithout('password')
+
+    const result = sut.execute(dto as any)
+
+    await expect(result).rejects.toThrow(new MissingParamError('password'))
+  })
 })
