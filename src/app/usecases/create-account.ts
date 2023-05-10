@@ -9,8 +9,9 @@ export class CreateAccount implements CreateAccountUseCase {
   async execute(
     dto: CreateAccountUseCaseInput
   ): Promise<CreateAccountUseCaseOutput> {
-    const { name } = dto
+    const { name, email } = dto
     if (!name) throw new MissingParamError('name')
+    if (!email) throw new MissingParamError('email')
 
     return {} as unknown as CreateAccountUseCaseOutput
   }
