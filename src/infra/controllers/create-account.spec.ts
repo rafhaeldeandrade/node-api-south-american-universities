@@ -7,6 +7,7 @@ import {
 } from '@/domain/usecases/create-account'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
+import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
 
 class CreateAccountUseCaseStub implements CreateAccountUseCase {
   async execute() {
@@ -118,6 +119,22 @@ describe('Create Account Controller', () => {
     expect(httpResponse.body).toEqual({
       error: true,
       message: `${paramName} param is invalid.`,
+    })
+  })
+
+  it('should return 409 if useCase throws EmailAlreadyExistsError', async () => {
+    const { sut, createAccountUseCaseStub } = makeSut()
+    const request = makeRequest()
+    jest
+      .spyOn(createAccountUseCaseStub, 'execute')
+      .mockRejectedValueOnce(new EmailAlreadyExistsError())
+
+    const httpResponse = await sut.handle(request)
+
+    expect(httpResponse.statusCode).toBe(409)
+    expect(httpResponse.body).toEqual({
+      error: true,
+      message: `Email already exists`,
     })
   })
 })
