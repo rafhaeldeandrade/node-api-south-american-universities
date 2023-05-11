@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker'
-import { CreateAccountController } from '@/infra/controllers/create-account'
+import { CreateAccountController } from '@/infra/controllers/account/create-account'
 import { HttpRequest } from '@/infra/contracts'
 import {
   CreateAccountUseCase,
   CreateAccountUseCaseOutput,
-} from '@/domain/usecases/create-account'
+} from '@/domain/usecases/account/create-account'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
 import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'

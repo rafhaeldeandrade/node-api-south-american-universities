@@ -1,54 +1,61 @@
-import { faker } from '@faker-js/faker'
 import { HttpRequest } from '@/infra/contracts'
+import { faker } from '@faker-js/faker'
+import { ChangeAccountPasswordController } from '@/infra/controllers/account/change-account-password'
+import {
+  ChangeAccountPasswordUseCase,
+  ChangeAccountPasswordUseCaseOutput,
+} from '@/domain/usecases/account/change-account-password'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
-import { LoginUseCase, LoginUseCaseOutput } from '@/domain/usecases/login'
-import { LoginController } from '@/infra/controllers/login'
-import { WrongPasswordError } from '@/app/errors/wrong-password'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'
+import { WrongPasswordError } from '@/app/errors/wrong-password'
 
-class LoginUseCaseStub implements LoginUseCase {
+class ChangeAccountPasswordUseCaseStub implements ChangeAccountPasswordUseCase {
   async execute() {
     return {
-      accessToken: faker.datatype.uuid(),
+      ok: true,
     }
   }
 }
 
 interface SutTypes {
-  sut: LoginController
-  loginUseCaseStub: LoginUseCase
+  sut: ChangeAccountPasswordController
+  changeAccountPasswordUseCaseStub: ChangeAccountPasswordUseCase
 }
 
 function makeSut(): SutTypes {
-  const loginUseCaseStub = new LoginUseCaseStub()
-  const sut = new LoginController(loginUseCaseStub)
-  return { sut, loginUseCaseStub }
+  const changeAccountPasswordUseCaseStub =
+    new ChangeAccountPasswordUseCaseStub()
+  const sut = new ChangeAccountPasswordController(
+    changeAccountPasswordUseCaseStub
+  )
+  return { sut, changeAccountPasswordUseCaseStub }
 }
 
 function makeRequest(): HttpRequest {
   return {
     body: {
       email: faker.internet.email(),
-      password: faker.internet.password(),
+      currentPassword: faker.internet.password(),
+      newPassword: faker.internet.password,
     },
   }
 }
 
-function makeUseCaseReturn(): LoginUseCaseOutput {
+function makeUseCaseReturn(): ChangeAccountPasswordUseCaseOutput {
   return {
-    accessToken: faker.datatype.uuid(),
+    ok: true,
   }
 }
 
-describe('Login Controller', () => {
+describe('Change Account Password Controller', () => {
   afterEach(() => {
     jest.restoreAllMocks()
   })
 
   it('should call LoginUseCase.execute with the correct values', async () => {
-    const { sut, loginUseCaseStub } = makeSut()
-    const executeSpy = jest.spyOn(loginUseCaseStub, 'execute')
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
+    const executeSpy = jest.spyOn(changeAccountPasswordUseCaseStub, 'execute')
     const request = makeRequest()
 
     await sut.handle(request)
@@ -58,8 +65,8 @@ describe('Login Controller', () => {
   })
 
   it('should call LoginUseCase.execute with the correct values when request has no body', async () => {
-    const { sut, loginUseCaseStub } = makeSut()
-    const executeSpy = jest.spyOn(loginUseCaseStub, 'execute')
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
+    const executeSpy = jest.spyOn(changeAccountPasswordUseCaseStub, 'execute')
     const request = makeRequest()
     const requestWithNoBody = { ...request, body: undefined }
 
@@ -70,11 +77,11 @@ describe('Login Controller', () => {
   })
 
   it('should return 200 with the correct value on success', async () => {
-    const { sut, loginUseCaseStub } = makeSut()
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
     const request = makeRequest()
     const fakeUseCaseReturn = makeUseCaseReturn()
     jest
-      .spyOn(loginUseCaseStub, 'execute')
+      .spyOn(changeAccountPasswordUseCaseStub, 'execute')
       .mockResolvedValueOnce(fakeUseCaseReturn)
 
     const httpResponse = await sut.handle(request)
@@ -84,11 +91,11 @@ describe('Login Controller', () => {
   })
 
   it('should return 400 if useCase throws MissingParamError', async () => {
-    const { sut, loginUseCaseStub } = makeSut()
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
     const request = makeRequest()
     const paramName = faker.internet.userName()
     jest
-      .spyOn(loginUseCaseStub, 'execute')
+      .spyOn(changeAccountPasswordUseCaseStub, 'execute')
       .mockRejectedValueOnce(new MissingParamError(paramName))
 
     const httpResponse = await sut.handle(request)
@@ -100,28 +107,28 @@ describe('Login Controller', () => {
     })
   })
 
-  it('should return 401 if useCase throws InvalidParamError', async () => {
-    const { sut, loginUseCaseStub } = makeSut()
+  it('should return 400 if useCase throws InvalidParamError', async () => {
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
     const request = makeRequest()
     const paramName = faker.internet.userName()
     jest
-      .spyOn(loginUseCaseStub, 'execute')
+      .spyOn(changeAccountPasswordUseCaseStub, 'execute')
       .mockRejectedValueOnce(new InvalidParamError(paramName))
 
     const httpResponse = await sut.handle(request)
 
-    expect(httpResponse.statusCode).toBe(401)
+    expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual({
       error: true,
-      message: 'Wrong credentials',
+      message: `${paramName} param is invalid`,
     })
   })
 
   it('should return 401 if useCase throws AccountNotFoundError', async () => {
-    const { sut, loginUseCaseStub } = makeSut()
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
     const request = makeRequest()
     jest
-      .spyOn(loginUseCaseStub, 'execute')
+      .spyOn(changeAccountPasswordUseCaseStub, 'execute')
       .mockRejectedValueOnce(new AccountNotFoundError())
 
     const httpResponse = await sut.handle(request)
@@ -134,10 +141,10 @@ describe('Login Controller', () => {
   })
 
   it('should return 401 if useCase throws WrongPasswordError', async () => {
-    const { sut, loginUseCaseStub } = makeSut()
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
     const request = makeRequest()
     jest
-      .spyOn(loginUseCaseStub, 'execute')
+      .spyOn(changeAccountPasswordUseCaseStub, 'execute')
       .mockRejectedValueOnce(new WrongPasswordError())
 
     const httpResponse = await sut.handle(request)
@@ -150,9 +157,11 @@ describe('Login Controller', () => {
   })
 
   it('should return 500 if useCase throws another Error not covered yet', async () => {
-    const { sut, loginUseCaseStub } = makeSut()
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
     const request = makeRequest()
-    jest.spyOn(loginUseCaseStub, 'execute').mockRejectedValueOnce(new Error())
+    jest
+      .spyOn(changeAccountPasswordUseCaseStub, 'execute')
+      .mockRejectedValueOnce(new Error())
 
     const httpResponse = await sut.handle(request)
 

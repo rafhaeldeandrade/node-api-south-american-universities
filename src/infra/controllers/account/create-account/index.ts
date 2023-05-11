@@ -1,7 +1,7 @@
-import { CreateAccountUseCase } from '@/domain/usecases/create-account'
+import { CreateAccountUseCase } from '@/domain/usecases/account/create-account'
 import { Controller, HttpRequest, HttpResponse } from '@/infra/contracts'
 import { created } from '@/infra/helpers/http'
-import { adaptError } from '@/infra/controllers/create-account/error-adapter'
+import { adaptError } from '@/infra/controllers/account/create-account/error-adapter'
 
 export class CreateAccountController implements Controller {
   constructor(private readonly useCase: CreateAccountUseCase) {}

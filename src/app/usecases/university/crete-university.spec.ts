@@ -3,10 +3,7 @@ import { faker } from '@faker-js/faker'
 import { University } from '@/domain/entities/university'
 import { UniversityRepository } from '@/domain/repositories/university'
 import { CreateUniversity } from '@/app/usecases/university/create-university'
-import {
-  CreateUniversityUseCase,
-  CreateUniversityUseCaseInput,
-} from '@/domain/usecases/university/create-university'
+import { CreateUniversityUseCaseInput } from '@/domain/usecases/university/create-university'
 import { UniversityAlreadyExistsError } from '@/app/errors/university-already-exists'
 import { UUIDGenerator } from '@/app/contracts/uuid-generator'
 
