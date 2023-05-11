@@ -33,6 +33,12 @@ describe('Argon2Adapter', () => {
     expect(sut.hash).toBeDefined()
   })
 
+  it('should have a method called compare', () => {
+    const { sut } = makeSut()
+
+    expect(sut.compare).toBeDefined()
+  })
+
   it('should call argon2 when hash is called, with the correct params', async () => {
     const { sut } = makeSut(argon2Options)
 
@@ -42,6 +48,22 @@ describe('Argon2Adapter', () => {
     await sut.hash(fakePassword)
 
     expect(hashSpy).toHaveBeenCalledWith(fakePassword, argon2Options)
+  })
+
+  it('should call argon2 when compare is called, with the correct params', async () => {
+    const { sut } = makeSut(argon2Options)
+
+    const verifySpy = jest.spyOn(argon2, 'verify').mockResolvedValueOnce(true)
+
+    const fakePassword = faker.internet.password()
+    const fakePasswordHash = faker.datatype.hexadecimal(10)
+    await sut.compare(fakePassword, fakePasswordHash)
+
+    expect(verifySpy).toHaveBeenCalledWith(
+      fakePasswordHash,
+      fakePassword,
+      argon2Options
+    )
   })
 
   it('should return a hash when hash is called on success', async () => {
@@ -68,6 +90,20 @@ describe('Argon2Adapter', () => {
 
     const fakePassword = faker.internet.password()
     const promise = sut.hash(fakePassword)
+
+    await expect(promise).rejects.toThrow()
+  })
+
+  it('should throw an error if argon2 throws when compare is called', async () => {
+    const { sut } = makeSut(argon2Options)
+
+    jest.spyOn(argon2, 'verify').mockImplementationOnce(async () => {
+      throw new Error()
+    })
+
+    const fakePassword = faker.internet.password()
+    const fakePasswordHash = faker.internet.password()
+    const promise = sut.compare(fakePassword, fakePasswordHash)
 
     await expect(promise).rejects.toThrow()
   })
