@@ -10,7 +10,7 @@
     "test:unit": "npm test -- -c jest.config.unit.ts --watch",
     "test:integration": "npm test -- -c jest.config.integration.ts --watch",
     "test:staged": "npm test -- -c jest.config.ts --findRelatedTests",
-    "test:ci": "npm test -- --runInBand --coverage",
+    "test:ci": "npm test -- --runInBand",
     "prepare": "husky install"
   },
   "keywords": [],

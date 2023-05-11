@@ -28,6 +28,14 @@ class UniversityRepositoryStub implements UniversityRepository {
   async save(university: University): Promise<University> {
     return makeUniversity()
   }
+
+  async findById(id: string): Promise<University | null> {
+    return makeUniversity()
+  }
+
+  async deleteById(id: string): Promise<void> {
+    return Promise.resolve()
+  }
 }
 
 class UUIDGeneratorStub implements UUIDGenerator {
