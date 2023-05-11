@@ -2,10 +2,10 @@ import { faker } from '@faker-js/faker'
 import { HttpRequest } from '@/infra/contracts'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
-import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
 import { LoginUseCase, LoginUseCaseOutput } from '@/domain/usecases/login'
 import { LoginController } from '@/infra/controllers/login'
 import { WrongPasswordError } from '@/app/errors/wrong-password'
+import { AccountNotFoundError } from '@/app/errors/account-not-found'
 
 class LoginUseCaseStub implements LoginUseCase {
   async execute() {
@@ -107,6 +107,22 @@ describe('Login Controller', () => {
     jest
       .spyOn(loginUseCaseStub, 'execute')
       .mockRejectedValueOnce(new InvalidParamError(paramName))
+
+    const httpResponse = await sut.handle(request)
+
+    expect(httpResponse.statusCode).toBe(401)
+    expect(httpResponse.body).toEqual({
+      error: true,
+      message: 'Wrong credentials',
+    })
+  })
+
+  it('should return 401 if useCase throws AccountNotFoundError', async () => {
+    const { sut, loginUseCaseStub } = makeSut()
+    const request = makeRequest()
+    jest
+      .spyOn(loginUseCaseStub, 'execute')
+      .mockRejectedValueOnce(new AccountNotFoundError())
 
     const httpResponse = await sut.handle(request)
 
