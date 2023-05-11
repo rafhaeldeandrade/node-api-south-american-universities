@@ -22,8 +22,8 @@ export class MongoDBAccountRepository implements AccountRepository {
     id: string,
     dataToUpdate: Partial<Account>
   ): Promise<void> {
-    await AccountModel.findByIdAndUpdate(
-      id,
+    await AccountModel.findOneAndUpdate(
+      { id },
       { ...dataToUpdate },
       { lean: true }
     )
