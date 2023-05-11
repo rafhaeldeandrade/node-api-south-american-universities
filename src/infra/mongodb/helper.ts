@@ -1,10 +1,15 @@
-import mongoose from 'mongoose'
+import mongoose, { ConnectOptions } from 'mongoose'
 
 export const mongooseHelper = {
-  connect: async (mongoURL: string): Promise<void> => {
-    if (!mongoURL) throw new Error('Mongo URL is required')
-    if (mongoose.connection.readyState === 1) return
-    await mongoose.connect(mongoURL)
+  connect: async (
+    mongoURL: string,
+    options?: ConnectOptions
+  ): Promise<void> => {
+    if (!mongoURL) throw new Error('Missing mongoURL')
+
+    if (mongoose.connection.readyState === 0) {
+      await mongoose.connect(mongoURL, options)
+    }
   },
   disconnect: async (): Promise<void> => {
     await mongoose.disconnect()
