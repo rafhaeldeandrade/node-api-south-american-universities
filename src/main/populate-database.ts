@@ -2,6 +2,7 @@ import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import cron from 'node-cron'
 import env from '@/main/config/environment-variables'
+import { randomUUID } from 'crypto'
 import { University } from '@/domain/entities/university'
 import { UniversityModel } from '@/infra/mongodb/schemas/university'
 import { mongooseHelper } from '@/infra/mongodb/helper'
@@ -18,6 +19,7 @@ axiosRetry(axios, {
 
 function mapToModel(universities: any[]): University[] {
   return universities.flatMap((university) => ({
+    id: randomUUID(),
     stateProvince: university['state-province'],
     alphaTwoCode: university['alpha_two_code'],
     webPages: university['web_pages'],

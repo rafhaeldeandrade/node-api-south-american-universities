@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 
 const universitySchema = new mongoose.Schema(
   {
+    id: { type: String, required: true },
     stateProvince: {
       type: String,
       required: false,

@@ -7,7 +7,7 @@ export function makeUniversity(props?: Partial<University>): University {
     name: faker.lorem.words(),
     domains: [faker.internet.domainName()],
     country: faker.address.country(),
-    stateProvince: faker.address.state(),
+    stateProvince: faker.address.stateAbbr(),
     alphaTwoCode: faker.address.countryCode(),
     webPages: [faker.internet.url()],
   }

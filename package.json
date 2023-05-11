@@ -55,6 +55,7 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.1.0",
     "node-cron": "^3.0.2",
-    "validator": "^13.9.0"
+    "validator": "^13.9.0",
+    "zod": "^3.21.4"
   }
 }
