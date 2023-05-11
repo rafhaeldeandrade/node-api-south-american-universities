@@ -117,7 +117,7 @@ describe('Login Controller', () => {
     })
   })
 
-  it('should return 409 if useCase throws WrongPasswordError', async () => {
+  it('should return 401 if useCase throws WrongPasswordError', async () => {
     const { sut, loginUseCaseStub } = makeSut()
     const request = makeRequest()
     jest

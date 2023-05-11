@@ -1,4 +1,8 @@
-import { badRequest, conflict, internalServerError } from '@/infra/helpers/http'
+import {
+  badRequest,
+  internalServerError,
+  unauthorized,
+} from '@/infra/helpers/http'
 
 export function adaptError(e: Error) {
   switch (e.name) {
@@ -8,8 +12,11 @@ export function adaptError(e: Error) {
     case 'MissingParamError': {
       return badRequest(e)
     }
-    case 'EmailAlreadyExistsError': {
-      return conflict(e)
+    case 'AccountNotFoundError': {
+      return unauthorized()
+    }
+    case 'WrongPasswordError': {
+      return unauthorized()
     }
     default: {
       return internalServerError()

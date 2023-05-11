@@ -5,6 +5,10 @@ import {
   ChangeAccountPasswordUseCase,
   ChangeAccountPasswordUseCaseOutput,
 } from '@/domain/usecases/change-account-password'
+import { MissingParamError } from '@/app/errors/missing-param'
+import { InvalidParamError } from '@/app/errors/invalid-param'
+import { AccountNotFoundError } from '@/app/errors/account-not-found'
+import { WrongPasswordError } from '@/app/errors/wrong-password'
 
 class ChangeAccountPasswordUseCaseStub implements ChangeAccountPasswordUseCase {
   async execute() {
@@ -84,5 +88,87 @@ describe('Change Account Password Controller', () => {
 
     expect(httpResponse.statusCode).toBe(200)
     expect(httpResponse.body).toEqual(fakeUseCaseReturn)
+  })
+
+  it('should return 400 if useCase throws MissingParamError', async () => {
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
+    const request = makeRequest()
+    const paramName = faker.internet.userName()
+    jest
+      .spyOn(changeAccountPasswordUseCaseStub, 'execute')
+      .mockRejectedValueOnce(new MissingParamError(paramName))
+
+    const httpResponse = await sut.handle(request)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual({
+      error: true,
+      message: `${paramName} param is missing`,
+    })
+  })
+
+  it('should return 400 if useCase throws InvalidParamError', async () => {
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
+    const request = makeRequest()
+    const paramName = faker.internet.userName()
+    jest
+      .spyOn(changeAccountPasswordUseCaseStub, 'execute')
+      .mockRejectedValueOnce(new InvalidParamError(paramName))
+
+    const httpResponse = await sut.handle(request)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual({
+      error: true,
+      message: `${paramName} param is invalid`,
+    })
+  })
+
+  it('should return 401 if useCase throws AccountNotFoundError', async () => {
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
+    const request = makeRequest()
+    jest
+      .spyOn(changeAccountPasswordUseCaseStub, 'execute')
+      .mockRejectedValueOnce(new AccountNotFoundError())
+
+    const httpResponse = await sut.handle(request)
+
+    expect(httpResponse.statusCode).toBe(401)
+    expect(httpResponse.body).toEqual({
+      error: true,
+      message: 'Wrong credentials',
+    })
+  })
+
+  it('should return 401 if useCase throws WrongPasswordError', async () => {
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
+    const request = makeRequest()
+    jest
+      .spyOn(changeAccountPasswordUseCaseStub, 'execute')
+      .mockRejectedValueOnce(new WrongPasswordError())
+
+    const httpResponse = await sut.handle(request)
+
+    expect(httpResponse.statusCode).toBe(401)
+    expect(httpResponse.body).toEqual({
+      error: true,
+      message: 'Wrong credentials',
+    })
+  })
+
+  it('should return 500 if useCase throws another Error not covered yet', async () => {
+    const { sut, changeAccountPasswordUseCaseStub } = makeSut()
+    const request = makeRequest()
+    jest
+      .spyOn(changeAccountPasswordUseCaseStub, 'execute')
+      .mockRejectedValueOnce(new Error())
+
+    const httpResponse = await sut.handle(request)
+
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual({
+      error: true,
+      message: `Internal Server Error`,
+    })
   })
 })
