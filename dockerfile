@@ -7,6 +7,13 @@ FROM base as development
 ENV NODE_ENV=development
 RUN yarn install
 
+FROM base as test
+RUN apk add curl-dev
+ENV NODE_ENV=test
+RUN touch /usr/src/app/.env.test
+RUN touch /usr/src/app/jest.config.ts
+RUN yarn install --frozen-lockfile
+
 FROM base as build
 RUN yarn build
 
