@@ -10,100 +10,12 @@ import { EmailValidator } from '@/infra/contracts'
 import { Hasher } from '@/app/contracts/hasher'
 import { Encrypter } from '@/app/contracts/encrypter'
 import { UUIDGenerator } from '@/app/contracts/uuid-generator'
-
-function generateRandomInvalidEmail(): string {
-  const invalidTLDs = ['.invalid', '.test', '.example', '.localhost']
-
-  const username = faker.internet.userName()
-  const domain = 'invalid'
-  const randomTLDIndex = Math.floor(Math.random() * invalidTLDs.length)
-  const tld = invalidTLDs[randomTLDIndex]
-
-  return `${username}@${domain}${tld}`
-}
-
-function generateRandomInvalidPassword(): string {
-  const validChars =
-    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!@#$%^&*()'
-
-  const passwordLength = 8
-
-  let password = ''
-  let charSet = validChars
-
-  const constraintToInvalidate = Math.floor(Math.random() * 4)
-  switch (constraintToInvalidate) {
-    case 0:
-      charSet = charSet.replaceAll(/[A-Z]/g, '')
-      break
-    case 1:
-      charSet = charSet.replaceAll(/[a-z]/g, '')
-      break
-    case 2:
-      charSet = charSet.replaceAll(/[0-9]/g, '')
-      break
-    case 3:
-      charSet = charSet.replaceAll(/[.!@#$%^&*()]/g, '')
-      break
-    default:
-      break
-  }
-
-  for (let i = 0; i < passwordLength; i++) {
-    password += getRandomChar(charSet)
-  }
-
-  return password
-}
-
-function generateRandomValidPassword(): string {
-  const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz'
-  const numberChars = '0123456789'
-  const specialChars = '.!@#$%^&*()'
-
-  let password = ''
-
-  password += getRandomChar(uppercaseChars)
-  password += getRandomChar(lowercaseChars)
-  password += getRandomChar(numberChars)
-  password += getRandomChar(specialChars)
-
-  const remainingLength = 8
-  for (let i = 0; i < remainingLength - 4; i++) {
-    const allChars =
-      uppercaseChars + lowercaseChars + numberChars + specialChars
-    password += getRandomChar(allChars)
-  }
-
-  password = shuffleString(password)
-
-  return password
-}
-
-function getRandomChar(characters: string): string {
-  const randomIndex = Math.floor(Math.random() * characters.length)
-  return characters.charAt(randomIndex)
-}
-
-function shuffleString(str: string): string {
-  const shuffledArray = Array.from(str)
-  for (let i = shuffledArray.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]]
-  }
-  return shuffledArray.join('')
-}
-
-function makeFakeAccount() {
-  return {
-    id: faker.datatype.uuid(),
-    name: faker.name.fullName(),
-    email: faker.internet.email(),
-    password: generateRandomValidPassword(),
-    accessToken: faker.datatype.uuid(),
-  }
-}
+import { makeAccount } from '@/__tests__/factories/account'
+import {
+  generateRandomInvalidEmail,
+  generateRandomInvalidPassword,
+  generateRandomValidPassword,
+} from '@/__tests__/helpers'
 
 class EmailValidatorStub implements EmailValidator {
   isValid(email: string): boolean {
@@ -117,7 +29,7 @@ class AccountRepositoryStub implements AccountRepository {
   }
 
   save(account: Account) {
-    return Promise.resolve(makeFakeAccount())
+    return Promise.resolve(makeAccount())
   }
 
   findByIdAndUpdate() {
@@ -284,7 +196,7 @@ describe('Create Account Use Case', () => {
     const { sut, accountRepositoryStub } = makeSut()
     jest
       .spyOn(accountRepositoryStub, 'findByEmail')
-      .mockResolvedValueOnce(makeFakeAccount())
+      .mockResolvedValueOnce(makeAccount())
     const dto = makeDTOWithout()
 
     const result = sut.execute(dto as CreateAccountUseCaseInput)
