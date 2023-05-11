@@ -14,4 +14,5 @@ export default {
     parallelism: 1,
     timeCost: 2,
   },
+  jwtSecret: process.env.JWT_SECRET || 'secretlysecret',
 }
