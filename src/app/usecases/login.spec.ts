@@ -119,7 +119,7 @@ class AccountRepositoryStub implements AccountRepository {
     return Promise.resolve(makeFakeAccount())
   }
 
-  findByIdAndUpdateAccessToken() {
+  findByIdAndUpdate() {
     return Promise.resolve()
   }
 }

@@ -10,12 +10,14 @@ import { AccountRepository } from '@/domain/repositories/account'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'
 import { HashComparer } from '@/app/contracts/hash-comparer'
 import { WrongPasswordError } from '@/app/errors/wrong-password'
+import { Hasher } from '@/app/contracts/hasher'
 
 export class ChangeAccountPassword implements ChangeAccountPasswordUseCase {
   constructor(
     private readonly emailValidator: EmailValidator,
     private readonly accountRepository: AccountRepository,
-    private readonly hashComparer: HashComparer
+    private readonly hashComparer: HashComparer,
+    private readonly hasher: Hasher
   ) {}
 
   async execute(
@@ -32,10 +34,14 @@ export class ChangeAccountPassword implements ChangeAccountPasswordUseCase {
     )
     if (!isHashValid) throw new WrongPasswordError()
 
-    // TODO HASHEAR NOVO PASSWORD
-    // TODO UPDATE PELO ID DO USUARIO, TROCANDO PASSWORD
-    // TODO RETORNAR { OK: TRUE }
-    return {} as unknown as ChangeAccountPasswordUseCaseOutput
+    const newPasswordHash = await this.hasher.hash(dto.newPassword)
+    await this.accountRepository.findByIdAndUpdate(account.id, {
+      password: newPasswordHash,
+    })
+
+    return {
+      ok: true,
+    }
   }
 
   validateDTO(dto: ChangeAccountPasswordUseCaseInput) {

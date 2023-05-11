@@ -8,6 +8,7 @@ import { Account } from '@/domain/entities/account'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'
 import { WrongPasswordError } from '../errors/wrong-password'
 import { HashComparer } from '../contracts/hash-comparer'
+import { Hasher } from '../contracts/hasher'
 
 function generateRandomValidPassword(): string {
   const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -73,7 +74,7 @@ class AccountRepositoryStub implements AccountRepository {
     return Promise.resolve(makeFakeAccount())
   }
 
-  findByIdAndUpdateAccessToken() {
+  findByIdAndUpdate() {
     return Promise.resolve()
   }
 }
@@ -84,23 +85,38 @@ class HashComparerStub implements HashComparer {
   }
 }
 
+class HasherStub implements Hasher {
+  hash(value: string) {
+    return Promise.resolve('hashed' + value)
+  }
+}
+
 interface SutTypes {
   sut: ChangeAccountPassword
   emailValidatorStub: EmailValidator
   accountRepositoryStub: AccountRepository
   hashComparerStub: HashComparer
+  hasherStub: Hasher
 }
 
 function makeSut(): SutTypes {
   const emailValidatorStub = new EmailValidatorStub()
   const accountRepositoryStub = new AccountRepositoryStub()
   const hashComparerStub = new HashComparerStub()
+  const hasherStub = new HasherStub()
   const sut = new ChangeAccountPassword(
     emailValidatorStub,
     accountRepositoryStub,
-    hashComparerStub
+    hashComparerStub,
+    hasherStub
   )
-  return { sut, emailValidatorStub, accountRepositoryStub, hashComparerStub }
+  return {
+    sut,
+    emailValidatorStub,
+    accountRepositoryStub,
+    hashComparerStub,
+    hasherStub,
+  }
 }
 
 function makeDTOWithout(
@@ -197,5 +213,49 @@ describe('Change Account Password Use Case', () => {
     const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
 
     await expect(result).rejects.toThrow(new WrongPasswordError())
+  })
+
+  it('should call Hasher.hash with the correct value', async () => {
+    const { sut, hasherStub } = makeSut()
+    const hashSpy = jest.spyOn(hasherStub, 'hash')
+    const dto = makeDTOWithout()
+
+    await sut.execute(dto as ChangeAccountPasswordUseCaseInput)
+
+    expect(hashSpy).toHaveBeenCalledTimes(1)
+    expect(hashSpy).toHaveBeenCalledWith(dto.newPassword)
+  })
+
+  it('should call AccountRepository.findByIdAndUpdate with the correct values', async () => {
+    const { sut, accountRepositoryStub, hasherStub } = makeSut()
+    const fakeAccount = makeFakeAccount()
+    jest
+      .spyOn(accountRepositoryStub, 'findByEmail')
+      .mockResolvedValueOnce(fakeAccount)
+    const fakePasswordHash = faker.datatype.uuid()
+    jest.spyOn(hasherStub, 'hash').mockResolvedValueOnce(fakePasswordHash)
+    const findByIdAndUpdateSpy = jest.spyOn(
+      accountRepositoryStub,
+      'findByIdAndUpdate'
+    )
+    const dto = makeDTOWithout()
+
+    await sut.execute(dto as ChangeAccountPasswordUseCaseInput)
+
+    expect(findByIdAndUpdateSpy).toHaveBeenCalledTimes(1)
+    expect(findByIdAndUpdateSpy).toHaveBeenCalledWith(fakeAccount.id, {
+      password: fakePasswordHash,
+    })
+  })
+
+  it('should return ok true when success', async () => {
+    const { sut } = makeSut()
+    const dto = makeDTOWithout()
+
+    const result = await sut.execute(dto as ChangeAccountPasswordUseCaseInput)
+
+    expect(result).toEqual({
+      ok: true,
+    })
   })
 })
