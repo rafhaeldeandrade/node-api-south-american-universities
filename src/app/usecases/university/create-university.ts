@@ -1,28 +1,42 @@
-import { MissingParamError } from '@/app/errors/missing-param'
 import {
   CreateUniversityUseCase,
   CreateUniversityUseCaseInput,
   CreateUniversityUseCaseOutput,
 } from '@/domain/usecases/university/create-university'
+import { UniversityRepository } from '@/domain/repositories/university'
+import { UniversityAlreadyExistsError } from '@/app/errors/university-already-exists'
+import { UUIDGenerator } from '@/app/contracts/uuid-generator'
 
 export class CreateUniversity implements CreateUniversityUseCase {
+  constructor(
+    private readonly universityRepository: UniversityRepository,
+    private readonly uuidGenerator: UUIDGenerator
+  ) {}
+
   async execute(
     dto: CreateUniversityUseCaseInput
   ): Promise<CreateUniversityUseCaseOutput> {
-    this.validateDTO(dto)
+    const university = await this.universityRepository.findByProperties({
+      name: dto.name,
+      stateProvince: dto.stateProvince,
+      country: dto.country,
+    })
+    if (university) throw new UniversityAlreadyExistsError()
 
-    return {} as unknown as CreateUniversityUseCaseOutput
-  }
+    const universityId = this.uuidGenerator.generateUUID()
+    await this.universityRepository.save({
+      id: universityId,
+      name: dto.name,
+      stateProvince: dto.stateProvince,
+      country: dto.country,
+      domains: dto.domains,
+      webPages: dto.webPages,
+      alphaTwoCode: dto.alphaTwoCode,
+    })
 
-  validateDTO(dto: CreateUniversityUseCaseInput) {
-    const { stateProvince, alphaTwoCode, webPages, country, name, domains } =
-      dto
-
-    if (!stateProvince) throw new MissingParamError('stateProvince')
-    if (!alphaTwoCode) throw new MissingParamError('alphaTwoCode')
-    if (!webPages) throw new MissingParamError('webPages')
-    if (!country) throw new MissingParamError('country')
-    if (!name) throw new MissingParamError('name')
-    if (!domains) throw new MissingParamError('domains')
+    return {
+      id: universityId,
+      ...dto,
+    }
   }
 }
