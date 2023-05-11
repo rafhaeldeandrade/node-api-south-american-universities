@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "populatedb": "tsc-alias && tsnd -r tsconfig-paths/register src/main/populate-database.ts",
+    "dev": "tsc-alias && tsnd -r tsconfig-paths/register src/main/server.ts",
     "test": "jest --passWithNoTests --noStackTrace",
     "test:unit": "npm test -- -c jest.config.unit.ts --watch",
     "test:staged": "npm test -- -c jest.config.ts --findRelatedTests",
@@ -15,6 +16,7 @@
   "license": "ISC",
   "devDependencies": {
     "@faker-js/faker": "^7.6.0",
+    "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.1",
     "@types/jsonwebtoken": "^9.0.2",
@@ -43,6 +45,7 @@
     "argon2": "^0.30.3",
     "axios": "^1.4.0",
     "axios-retry": "^3.4.0",
+    "cors": "^2.8.5",
     "express": "^4.18.2",
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.1.0",
