@@ -3,6 +3,7 @@ export interface Controller {
 }
 
 export interface HttpRequest {
+  params?: any
   body?: any
 }
 

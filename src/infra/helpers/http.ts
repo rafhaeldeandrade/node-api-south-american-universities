@@ -49,6 +49,13 @@ export function conflict(error: EmailAlreadyExistsError): HttpResponse {
   }
 }
 
+export function notFound(): HttpResponse {
+  return {
+    statusCode: 404,
+    body: {},
+  }
+}
+
 export function internalServerError(): HttpResponse {
   return {
     statusCode: 500,
