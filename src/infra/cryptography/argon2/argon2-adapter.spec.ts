@@ -56,7 +56,7 @@ describe('Argon2Adapter', () => {
     const verifySpy = jest.spyOn(argon2, 'verify').mockResolvedValueOnce(true)
 
     const fakePassword = faker.internet.password()
-    const fakePasswordHash = faker.datatype.hexadecimal(10)
+    const fakePasswordHash = faker.datatype.hexadecimal({ length: 10 })
     await sut.compare(fakePassword, fakePasswordHash)
 
     expect(verifySpy).toHaveBeenCalledWith(
