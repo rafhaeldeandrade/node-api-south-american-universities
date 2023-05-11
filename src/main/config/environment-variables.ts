@@ -6,7 +6,9 @@ dotenv.config({
 })
 
 export default {
-  mongoUrl: process.env.MONGO_URL || 'mongodb://localhost:27017',
+  mongoUrl:
+    `${process.env.MONGO_URL}/universities` ||
+    'mongodb://localhost:27017/universities',
   apiPort: process.env.API_PORT || 4000,
   argon2Options: {
     type: argon2.argon2id,

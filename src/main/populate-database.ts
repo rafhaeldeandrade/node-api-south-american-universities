@@ -43,7 +43,7 @@ async function populateDatabase() {
   )
   const universitiesToSave = mapToModel(universities.flat())
 
-  await mongooseHelper.connect(`${env.mongoUrl}/universities`)
+  await mongooseHelper.connect(env.mongoUrl)
   await insertManyWithRetry(universitiesToSave)
 }
 
