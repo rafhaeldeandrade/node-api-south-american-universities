@@ -1,7 +1,7 @@
 import { Controller, HttpRequest, HttpResponse } from '@/infra/contracts'
 import { ok } from '@/infra/helpers/http'
 import { adaptError } from '@/infra/controllers/change-account-password/error-adapter'
-import { ChangeAccountPasswordUseCase } from '@/domain/usecases/change-account-password'
+import { ChangeAccountPasswordUseCase } from '@/domain/usecases/account/change-account-password'
 
 export class ChangeAccountPasswordController implements Controller {
   constructor(private readonly useCase: ChangeAccountPasswordUseCase) {}

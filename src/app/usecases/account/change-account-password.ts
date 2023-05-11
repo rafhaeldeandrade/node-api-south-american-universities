@@ -2,7 +2,7 @@ import {
   ChangeAccountPasswordUseCase,
   ChangeAccountPasswordUseCaseInput,
   ChangeAccountPasswordUseCaseOutput,
-} from '@/domain/usecases/change-account-password'
+} from '@/domain/usecases/account/change-account-password'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { EmailValidator } from '@/infra/contracts'
 import { InvalidParamError } from '@/app/errors/invalid-param'

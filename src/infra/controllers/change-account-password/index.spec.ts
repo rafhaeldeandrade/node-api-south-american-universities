@@ -4,7 +4,7 @@ import { ChangeAccountPasswordController } from '@/infra/controllers/change-acco
 import {
   ChangeAccountPasswordUseCase,
   ChangeAccountPasswordUseCaseOutput,
-} from '@/domain/usecases/change-account-password'
+} from '@/domain/usecases/account/change-account-password'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'

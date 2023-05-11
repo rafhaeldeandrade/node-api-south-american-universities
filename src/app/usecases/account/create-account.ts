@@ -2,7 +2,7 @@ import {
   CreateAccountUseCase,
   CreateAccountUseCaseInput,
   CreateAccountUseCaseOutput,
-} from '@/domain/usecases/create-account'
+} from '@/domain/usecases/account/create-account'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountRepository } from '@/domain/repositories/account'

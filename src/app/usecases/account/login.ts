@@ -2,7 +2,7 @@ import {
   LoginUseCase,
   LoginUseCaseInput,
   LoginUseCaseOutput,
-} from '@/domain/usecases/login'
+} from '@/domain/usecases/account/login'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { EmailValidator } from '@/infra/contracts'
 import { InvalidParamError } from '@/app/errors/invalid-param'

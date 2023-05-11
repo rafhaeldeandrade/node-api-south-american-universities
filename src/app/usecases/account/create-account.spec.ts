@@ -1,5 +1,5 @@
-import { CreateAccount } from '@/app/usecases/create-account'
-import { CreateAccountUseCaseInput } from '@/domain/usecases/create-account'
+import { CreateAccount } from '@/app/usecases/account/create-account'
+import { CreateAccountUseCaseInput } from '@/domain/usecases/account/create-account'
 import { faker } from '@faker-js/faker'
 import { MissingParamError } from '@/app/errors/missing-param'
 import { InvalidParamError } from '@/app/errors/invalid-param'
@@ -8,8 +8,8 @@ import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
 import { Account } from '@/domain/entities/account'
 import { EmailValidator } from '@/infra/contracts'
 import { Hasher } from '@/app/contracts/hasher'
-import { Encrypter } from '../contracts/encrypter'
-import { UUIDGenerator } from '../contracts/uuid-generator'
+import { Encrypter } from '@/app/contracts/encrypter'
+import { UUIDGenerator } from '@/app/contracts/uuid-generator'
 
 function generateRandomInvalidEmail(): string {
   const invalidTLDs = ['.invalid', '.test', '.example', '.localhost']
