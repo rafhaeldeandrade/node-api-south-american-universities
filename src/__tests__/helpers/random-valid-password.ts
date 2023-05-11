@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 export function generateRandomValidPassword(): string {
   const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz'

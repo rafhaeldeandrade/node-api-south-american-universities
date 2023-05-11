@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 export function generateRandomInvalidEmail(): string {
   const invalidEmails = [
     'invalid-email',

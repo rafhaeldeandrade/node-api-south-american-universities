@@ -1,3 +1,4 @@
+/* istanbul ignore file */
 export function generateRandomInvalidPassword(): string {
   const validChars =
     'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!@#$%^&*()'
