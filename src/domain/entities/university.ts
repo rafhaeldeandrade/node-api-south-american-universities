@@ -1,4 +1,5 @@
 export interface University {
+  id: string
   stateProvince: string | null
   alphaTwoCode: string
   webPages: string[]
