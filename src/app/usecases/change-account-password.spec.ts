@@ -1,14 +1,60 @@
-import { EmailValidator } from '@/infra/contracts'
-import { ChangeAccountPassword } from './change-account-password'
-import { ChangeAccountPasswordUseCaseInput } from '@/domain/usecases/change-account-password'
 import { faker } from '@faker-js/faker'
-import { MissingParamError } from '../errors/missing-param'
+import { EmailValidator } from '@/infra/contracts'
+import { ChangeAccountPassword } from '@/app/usecases/change-account-password'
+import { ChangeAccountPasswordUseCaseInput } from '@/domain/usecases/change-account-password'
+import { MissingParamError } from '@/app/errors/missing-param'
 import { AccountRepository } from '@/domain/repositories/account'
 import { Account } from '@/domain/entities/account'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'
-import { WrongPasswordError } from '../errors/wrong-password'
-import { HashComparer } from '../contracts/hash-comparer'
-import { Hasher } from '../contracts/hasher'
+import { WrongPasswordError } from '@/app/errors/wrong-password'
+import { HashComparer } from '@/app/contracts/hash-comparer'
+import { Hasher } from '@/app/contracts/hasher'
+import { InvalidParamError } from '@/app/errors/invalid-param'
+
+function generateRandomInvalidEmail(): string {
+  const invalidTLDs = ['.invalid', '.test', '.example', '.localhost']
+
+  const username = faker.internet.userName()
+  const domain = 'invalid'
+  const randomTLDIndex = Math.floor(Math.random() * invalidTLDs.length)
+  const tld = invalidTLDs[randomTLDIndex]
+
+  return `${username}@${domain}${tld}`
+}
+
+function generateRandomInvalidPassword(): string {
+  const validChars =
+    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.!@#$%^&*()'
+
+  const passwordLength = 8
+
+  let password = ''
+  let charSet = validChars
+
+  const constraintToInvalidate = Math.floor(Math.random() * 4)
+  switch (constraintToInvalidate) {
+    case 0:
+      charSet = charSet.replaceAll(/[A-Z]/g, '')
+      break
+    case 1:
+      charSet = charSet.replaceAll(/[a-z]/g, '')
+      break
+    case 2:
+      charSet = charSet.replaceAll(/[0-9]/g, '')
+      break
+    case 3:
+      charSet = charSet.replaceAll(/[.!@#$%^&*()]/g, '')
+      break
+    default:
+      break
+  }
+
+  for (let i = 0; i < passwordLength; i++) {
+    password += getRandomChar(charSet)
+  }
+
+  return password
+}
 
 function generateRandomValidPassword(): string {
   const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
@@ -164,6 +210,66 @@ describe('Change Account Password Use Case', () => {
     const result = sut.execute(dto as any)
 
     await expect(result).rejects.toThrow(new MissingParamError('newPassword'))
+  })
+
+  it('should throw InvalidParamError if email is invalid', async () => {
+    const { sut, emailValidatorStub } = makeSut()
+    jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
+
+    const dto = makeDTOWithout()
+    dto.email = generateRandomInvalidEmail()
+
+    const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
+
+    await expect(result).rejects.toThrow(new InvalidParamError('email'))
+  })
+
+  it('should throw InvalidParamError if currentPassword has less than 8 characters', async () => {
+    const { sut } = makeSut()
+
+    const dto = makeDTOWithout()
+    dto.currentPassword = generateRandomInvalidPassword().substring(0, 7)
+
+    const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
+
+    await expect(result).rejects.toThrow(
+      new InvalidParamError('currentPassword')
+    )
+  })
+
+  it('should throw InvalidParamError if currentPassword doesnt have at least 1 uppercase character, 1 lowercase character and 1 special character', async () => {
+    const { sut } = makeSut()
+
+    const dto = makeDTOWithout()
+    dto.currentPassword = generateRandomInvalidPassword()
+
+    const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
+
+    await expect(result).rejects.toThrow(
+      new InvalidParamError('currentPassword')
+    )
+  })
+
+  it('should throw InvalidParamError if newPassword has less than 8 characters', async () => {
+    const { sut } = makeSut()
+
+    const dto = makeDTOWithout()
+    dto.newPassword = generateRandomInvalidPassword().substring(0, 7)
+
+    const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
+
+    await expect(result).rejects.toThrow(new InvalidParamError('newPassword'))
+  })
+
+  it('should throw InvalidParamError if newPassword doesnt have at least 1 uppercase character, 1 lowercase character and 1 special character', async () => {
+    const { sut } = makeSut()
+
+    const dto = makeDTOWithout()
+    dto.newPassword = generateRandomInvalidPassword()
+
+    const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
+
+    await expect(result).rejects.toThrow(new InvalidParamError('newPassword'))
   })
 
   it('should call AccountRepository.findByEmail with the correct value', async () => {
