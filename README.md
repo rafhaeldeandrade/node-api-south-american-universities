@@ -92,4 +92,4 @@ Para executar os testes automatizados, siga as etapas abaixo:
 
 ## Documentação
 
-Acesse a documentação online do projeto: [Link](https://rafhael.docs.apiary.io/#)
+Acesse a documentação online do projeto: [Link aqui](https://southamericanuniversities.docs.apiary.io/#)
