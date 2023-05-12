@@ -1,0 +1,11 @@
+services:
+  south-americans-api:
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: base
+  populate-mongdb:
+    build:
+      context: .
+      dockerfile: dockerfile
+      target: base

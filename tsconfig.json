@@ -6,11 +6,13 @@
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
+    "rootDir": "src",
     "baseUrl": "src",
     "paths": {
       "@/*": ["./*"]
     },
     "outDir": "dist",
     "lib": ["ES2021.String"]
-  }
+  },
+  "include": ["src"]
 }

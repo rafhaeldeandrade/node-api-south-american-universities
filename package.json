@@ -11,6 +11,8 @@
     "test:integration": "npm test -- -c jest.config.integration.ts --watch",
     "test:staged": "npm test -- -c jest.config.ts --findRelatedTests",
     "test:ci": "npm test -- --runInBand",
+    "build": "tsc --build --clean && tsc --build && tsc-alias -p tsconfig.json",
+    "start": "node ./dist/main/server.js",
     "prepare": "husky install"
   },
   "keywords": [],

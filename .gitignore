@@ -5,3 +5,4 @@ data
 .env.production
 .env.test
 coverage
+dist
