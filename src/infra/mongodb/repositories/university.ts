@@ -56,6 +56,13 @@ export class MongoDBUniversityRepository implements UniversityRepository {
     return universities.map((university) => this.mapModelToDomain(university))
   }
 
+  async findByIdAndUpdate(
+    id: string,
+    dataToUpdate: Partial<University>
+  ): Promise<void> {
+    await UniversityModel.findOneAndUpdate({ id }, dataToUpdate, { lean: true })
+  }
+
   mapModelToDomain(model: any): University {
     return {
       id: model.id,
