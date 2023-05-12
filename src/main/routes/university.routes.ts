@@ -8,13 +8,13 @@ import { makeUpdateUniversityController } from '@/main/factories/update-universi
 
 export default function (router: Router): void {
   router.get(
-    '/universities',
-    adaptRoute(makeLoadUniversitiesController())
+    '/universities/:universityId',
+    adaptRoute(makeLoadUniversityController())
   ) as RequestHandler
 
   router.get(
-    '/universities/:universityId',
-    adaptRoute(makeLoadUniversityController())
+    '/universities',
+    adaptRoute(makeLoadUniversitiesController())
   ) as RequestHandler
 
   router.post(

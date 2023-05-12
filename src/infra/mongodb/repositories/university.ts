@@ -4,7 +4,7 @@ import { UniversityModel } from '@/infra/mongodb/schemas/university'
 
 export class MongoDBUniversityRepository implements UniversityRepository {
   async findById(id: string): Promise<University | null> {
-    const university = UniversityModel.findOne({ id })
+    const university = await UniversityModel.findOne({ id }, {}, { lean: true })
     if (!university) return null
 
     return this.mapModelToDomain(university)
@@ -35,7 +35,15 @@ export class MongoDBUniversityRepository implements UniversityRepository {
   }
 
   async countDocuments(properties: Partial<University>): Promise<number> {
-    return await UniversityModel.countDocuments(properties, { lean: true })
+    const propsWithRegex: any = {}
+    for (const [key, value] of Object.entries(properties)) {
+      propsWithRegex[key] = {
+        $regex: value,
+        $options: 'i',
+      }
+    }
+
+    return await UniversityModel.countDocuments(propsWithRegex, { lean: true })
   }
 
   async findAll(
@@ -47,8 +55,16 @@ export class MongoDBUniversityRepository implements UniversityRepository {
       findOptions = options
     }
 
+    const propsWithRegex: any = {}
+    for (const [key, value] of Object.entries(props)) {
+      propsWithRegex[key] = {
+        $regex: value,
+        $options: 'i',
+      }
+    }
+
     const universities = await UniversityModel.find(
-      props,
+      propsWithRegex,
       {},
       { lean: true, ...findOptions }
     )
