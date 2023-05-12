@@ -1,6 +1,19 @@
 # South American Universities API
 
-API Node.js com Express e MongoDB
+API utilizando as seguintes tecnologias:
+- TypeScript
+- Node.js
+- Express.js
+- MongoDB
+- Docker
+- Argon2
+- JWT
+- Node-cron
+- Axios & Axios-retry
+- Mongoose
+- Zod
+
+Há também um link em produção para testes: [https://south-americans-api.up.railway.app/api/v1/](https://south-americans-api.up.railway.app/api/v1/)
 
 ## Índice
 
@@ -60,11 +73,12 @@ Siga as etapas abaixo para instalar e configurar o projeto:
 ## Utilização
 
 A API  oferece os seguintes endpoints:
-- GET /universities: Retorna a lista de todas as universidades cadastradas.
-- GET /universities/{id}: Retorna os detalhes de uma universidade específica com base no ID fornecido.
-- POST /universities: Cria uma nova universidade com base nos dados enviados no corpo da requisição.
-- PUT /universities/{id}: Atualiza os dados de uma universidade específica com base no ID fornecido.
-- DELETE /universities/{id}: Remove uma universidade específica com base no ID fornecido.
+
+GET /universities: Retorna a lista de todas as universidades cadastradas.
+GET /universities/{id}: Retorna os detalhes de uma universidade específica com base no ID fornecido.
+POST /universities: Cria uma nova universidade com base nos dados enviados no corpo da requisição.
+PUT /universities/{id}: Atualiza os dados de uma universidade específica com base no ID fornecido.
+DELETE /universities/{id}: Remove uma universidade específica com base no ID fornecido.
 
 ## Testes
 
