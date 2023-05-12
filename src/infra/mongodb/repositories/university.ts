@@ -4,7 +4,7 @@ import { UniversityModel } from '@/infra/mongodb/schemas/university'
 
 export class MongoDBUniversityRepository implements UniversityRepository {
   async findById(id: string): Promise<University | null> {
-    const university = UniversityModel.findById(id)
+    const university = UniversityModel.findOne({ id })
     if (!university) return null
 
     return this.mapModelToDomain(university)

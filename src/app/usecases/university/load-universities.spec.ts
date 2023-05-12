@@ -55,9 +55,9 @@ describe('Load Universities Use Case', () => {
   it('should call UniversityRepository.countDocuments with correct values', async () => {
     const { sut, universityRepositoryStub } = makeSut()
     const countSpy = jest.spyOn(universityRepositoryStub, 'countDocuments')
-    const props = {} as LoadUniversitiesUseCaseInput
+    const dto = {} as LoadUniversitiesUseCaseInput
 
-    await sut.execute(props)
+    await sut.execute(dto)
 
     expect(countSpy).toHaveBeenCalledTimes(1)
     expect(countSpy).toHaveBeenCalledWith({})
