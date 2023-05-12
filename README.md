@@ -27,7 +27,7 @@ Há também um link em produção para testes: [https://south-americans-api.up.r
 
 ## Sobre
 
-A South American Universities API uma interface de programação de aplicativos que permite visualizar, criar, editar e excluir informações sobre universidades em todo o mundo. Com essa API, os desenvolvedores podem obter acesso a um extenso conjunto de dados sobre instituições de ensino superior globalmente, permitindo a criação de aplicativos, sites e serviços relacionados a universidades.
+A South American Universities API é uma interface de programação de aplicativos que permite visualizar, criar, editar e excluir informações sobre universidades em todo o mundo. Com essa API, os desenvolvedores podem obter acesso a um extenso conjunto de dados sobre instituições de ensino superior globalmente, permitindo a criação de aplicativos, sites e serviços relacionados a universidades.
 
 ## Recursos
 
