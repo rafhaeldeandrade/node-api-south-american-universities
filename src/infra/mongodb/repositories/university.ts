@@ -21,7 +21,7 @@ export class MongoDBUniversityRepository implements UniversityRepository {
     properties: Partial<University>
   ): Promise<University | null> {
     const university = await UniversityModel.findOne(
-      { ...properties },
+      properties,
       {},
       { lean: true }
     )
@@ -32,6 +32,28 @@ export class MongoDBUniversityRepository implements UniversityRepository {
 
   async deleteById(id: string): Promise<void> {
     await UniversityModel.deleteOne({ id })
+  }
+
+  async countDocuments(properties: Partial<University>): Promise<number> {
+    return await UniversityModel.countDocuments(properties, { lean: true })
+  }
+
+  async findAll(
+    props: Partial<University>,
+    options?: { skip: number; limit: number }
+  ): Promise<University[]> {
+    let findOptions = {}
+    if (options) {
+      findOptions = options
+    }
+
+    const universities = await UniversityModel.find(
+      props,
+      {},
+      { lean: true, ...findOptions }
+    )
+
+    return universities.map((university) => this.mapModelToDomain(university))
   }
 
   mapModelToDomain(model: any): University {

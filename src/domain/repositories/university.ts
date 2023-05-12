@@ -5,4 +5,9 @@ export interface UniversityRepository {
   findByProperties(props: Partial<University>): Promise<University | null>
   save(university: University): Promise<University>
   deleteById(id: string): Promise<void>
+  countDocuments(props: Partial<University>): Promise<number>
+  findAll(
+    props: Partial<University>,
+    options?: { skip: number; limit: number }
+  ): Promise<University[]>
 }

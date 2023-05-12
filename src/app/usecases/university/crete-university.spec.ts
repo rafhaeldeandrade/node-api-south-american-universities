@@ -36,6 +36,17 @@ class UniversityRepositoryStub implements UniversityRepository {
   async deleteById(id: string): Promise<void> {
     return Promise.resolve()
   }
+
+  async findAll(
+    props: Partial<University>,
+    options?: { skip: number; limit: number } | undefined
+  ): Promise<University[]> {
+    return [makeUniversity()]
+  }
+
+  async countDocuments(props: Partial<University>): Promise<number> {
+    return faker.datatype.number()
+  }
 }
 
 class UUIDGeneratorStub implements UUIDGenerator {
