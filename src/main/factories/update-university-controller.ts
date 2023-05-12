@@ -9,7 +9,7 @@ import { UpdateUniversityController } from '@/infra/controllers/university/updat
 export function makeUpdateUniversityController(): Controller {
   const zodSchema = z.object({
     universityId: z.string(),
-    name: z.string().min(5).max(100),
+    name: z.string().min(3).max(100),
     domains: z.array(z.string().min(5).max(100)),
     webPages: z.array(z.string().min(5).max(100).url()),
   })

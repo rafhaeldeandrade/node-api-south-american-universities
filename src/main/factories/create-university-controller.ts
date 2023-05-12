@@ -9,7 +9,7 @@ import { MongoDBUniversityRepository } from '@/infra/mongodb/repositories/univer
 
 export function makeCreateUniversityController(): Controller {
   const zodSchema = z.object({
-    name: z.string().min(5).max(100),
+    name: z.string().min(3).max(100),
     country: z.string().min(3).max(50),
     stateProvince: z.string().min(2).max(25).nullable(),
     domains: z.array(z.string().min(5).max(100)),
