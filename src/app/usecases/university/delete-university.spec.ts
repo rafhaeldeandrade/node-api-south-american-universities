@@ -35,6 +35,13 @@ class UniversityRepositoryStub implements UniversityRepository {
   async countDocuments(props: Partial<University>): Promise<number> {
     return faker.datatype.number()
   }
+
+  async findByIdAndUpdate(
+    id: string,
+    dataToUpdate: Partial<University>
+  ): Promise<void> {
+    return Promise.resolve()
+  }
 }
 
 interface SutTypes {

@@ -10,4 +10,8 @@ export interface UniversityRepository {
     props: Partial<University>,
     options?: { skip: number; limit: number }
   ): Promise<University[]>
+  findByIdAndUpdate(
+    id: string,
+    dataToUpdate: Partial<University>
+  ): Promise<void>
 }

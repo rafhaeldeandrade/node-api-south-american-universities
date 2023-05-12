@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker'
-import { LoadUniversity } from '@/app/usecases/university/load-university'
+
+import { UpdateUniversity } from '@/app/usecases/university/update-university'
 import { UniversityRepository } from '@/domain/repositories/university'
 import { makeUniversity } from '@/__tests__/factories/university'
 import { University } from '@/domain/entities/university'
-import { LoadUniversityUseCaseInput } from '@/domain/usecases/university/load-university'
 import { UniversityNotFoundError } from '@/app/errors/university-not-found'
 
 class UniversityRepositoryStub implements UniversityRepository {
@@ -45,61 +45,91 @@ class UniversityRepositoryStub implements UniversityRepository {
 }
 
 interface SutTypes {
-  sut: LoadUniversity
+  sut: UpdateUniversity
   universityRepositoryStub: UniversityRepository
 }
 
 function makeSut(): SutTypes {
   const universityRepositoryStub = new UniversityRepositoryStub()
-  const sut = new LoadUniversity(universityRepositoryStub)
-
-  return { sut, universityRepositoryStub }
-}
-
-function makeDTO(): LoadUniversityUseCaseInput {
+  const sut = new UpdateUniversity(universityRepositoryStub)
   return {
-    universityId: faker.datatype.uuid(),
+    sut,
+    universityRepositoryStub,
   }
 }
 
-describe('LoadUniversityById use case', () => {
+function makeDTO() {
+  return {
+    universityId: faker.datatype.uuid(),
+    name: faker.lorem.words(),
+    domains: [faker.internet.domainName()],
+    webPages: [faker.internet.url()],
+  }
+}
+
+describe('UpdateUniversity use case', () => {
   afterEach(() => {
     jest.restoreAllMocks()
   })
 
   it('should call UniversityRepository.findById with the correct value', async () => {
     const { sut, universityRepositoryStub } = makeSut()
-    const findByIdSpy = jest.spyOn(universityRepositoryStub, 'findById')
-
     const dto = makeDTO()
+    const updateSpy = jest.spyOn(universityRepositoryStub, 'findById')
 
     await sut.execute(dto)
 
-    expect(findByIdSpy).toHaveBeenCalledTimes(1)
-    expect(findByIdSpy).toHaveBeenCalledWith(dto.universityId)
+    expect(updateSpy).toHaveBeenCalledTimes(1)
+    expect(updateSpy).toHaveBeenCalledWith(dto.universityId)
   })
 
-  it('should throw if loadUniversityByIdRepository throws', async () => {
+  it('should throw UniversityNotFoundError if UniversityRepository.findById returns null', async () => {
     const { sut, universityRepositoryStub } = makeSut()
+    const dto = makeDTO()
+    jest.spyOn(universityRepositoryStub, 'findById').mockResolvedValueOnce(null)
+
+    const promise = sut.execute(dto)
+
+    await expect(promise).rejects.toThrow(new UniversityNotFoundError())
+  })
+
+  it('should throw if UniversityRepository.findById throws', async () => {
+    const { sut, universityRepositoryStub } = makeSut()
+    const dto = makeDTO()
     jest
       .spyOn(universityRepositoryStub, 'findById')
       .mockRejectedValueOnce(new Error())
-
-    const dto = makeDTO()
 
     const promise = sut.execute(dto)
 
     await expect(promise).rejects.toThrow()
   })
 
-  it('should throw UniversityNotFoundError if UniversityRepository.findById returns null', async () => {
+  it('should call UniversityRepository.findByIdAndUpdate with the correct value', async () => {
     const { sut, universityRepositoryStub } = makeSut()
-    jest.spyOn(universityRepositoryStub, 'findById').mockResolvedValueOnce(null)
     const dto = makeDTO()
+    const updateSpy = jest.spyOn(universityRepositoryStub, 'findByIdAndUpdate')
+
+    await sut.execute(dto)
+
+    expect(updateSpy).toHaveBeenCalledTimes(1)
+    expect(updateSpy).toHaveBeenCalledWith(dto.universityId, {
+      name: dto.name,
+      domains: dto.domains,
+      webPages: dto.webPages,
+    })
+  })
+
+  it('should throw if UniversityRepository.findByIdAndUpdate throws', async () => {
+    const { sut, universityRepositoryStub } = makeSut()
+    const dto = makeDTO()
+    jest
+      .spyOn(universityRepositoryStub, 'findByIdAndUpdate')
+      .mockRejectedValueOnce(new Error())
 
     const promise = sut.execute(dto)
 
-    await expect(promise).rejects.toThrow(new UniversityNotFoundError())
+    await expect(promise).rejects.toThrow()
   })
 
   it('should return the correct values on success', async () => {
@@ -110,15 +140,15 @@ describe('LoadUniversityById use case', () => {
       .mockResolvedValueOnce(fakeUniversity)
     const dto = makeDTO()
 
-    const result = await sut.execute(dto)
+    const promise = sut.execute(dto)
 
-    expect(result).toEqual({
+    await expect(promise).resolves.toEqual({
       id: fakeUniversity.id,
-      name: fakeUniversity.name,
+      name: dto.name,
       country: fakeUniversity.country,
       stateProvince: fakeUniversity.stateProvince,
-      domains: fakeUniversity.domains,
-      webPages: fakeUniversity.webPages,
+      domains: dto.domains,
+      webPages: dto.webPages,
       alphaTwoCode: fakeUniversity.alphaTwoCode,
     })
   })
