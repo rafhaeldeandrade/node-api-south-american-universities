@@ -18,6 +18,7 @@ export class ZodSchemaValidator implements SchemaValidator {
         'invalid_date',
         'too_small',
         'too_big',
+        'email',
       ]
       if (invalidParams.includes(issueCode)) {
         if (issueMessage === 'Required') {
