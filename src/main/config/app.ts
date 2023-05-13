@@ -25,7 +25,7 @@ app.use(limiter)
 
 setupRoutes(app).catch(console.error)
 
-app.use((_req: Request, res: Response, _next: NextFunction) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({
     error: true,
     message:
