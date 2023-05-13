@@ -72,12 +72,17 @@ Siga as etapas abaixo para instalar e configurar o projeto:
 
 ## Utilização
 
-A API  oferece os seguintes endpoints:
+A API  oferece os seguintes endpoints para universidades:
 - GET /universities: Retorna a lista de todas as universidades cadastradas.
 - GET /universities/{id}: Retorna os detalhes de uma universidade específica com base no ID fornecido.
 - POST /universities: Cria uma nova universidade com base nos dados enviados no corpo da requisição.
 - PUT /universities/{id}: Atualiza os dados de uma universidade específica com base no ID fornecido.
 - DELETE /universities/{id}: Remove uma universidade específica com base no ID fornecido.
+
+Para teste apenas:
+- POST /signup: Cria uma nova conta de usuário com base nos dados enviados no corpo da requisição
+- POST /login: Autentica com sua conta previamente criada
+- POST /change-password: Altera a senha da conta previamente criada
 
 ## Testes
 
