@@ -3,18 +3,14 @@ import {
   CreateAccountUseCaseInput,
   CreateAccountUseCaseOutput,
 } from '@/domain/usecases/account/create-account'
-import { MissingParamError } from '@/app/errors/missing-param'
-import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountRepository } from '@/domain/repositories/account'
 import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
-import { EmailValidator } from '@/infra/contracts'
 import { Hasher } from '@/app/contracts/hasher'
 import { Encrypter } from '@/app/contracts/encrypter'
 import { UUIDGenerator } from '@/app/contracts/uuid-generator'
 
 export class CreateAccount implements CreateAccountUseCase {
   constructor(
-    private readonly emailValidator: EmailValidator,
     private readonly accountRepository: AccountRepository,
     private readonly uuidGenerator: UUIDGenerator,
     private readonly hasher: Hasher,

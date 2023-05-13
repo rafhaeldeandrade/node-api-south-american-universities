@@ -1,25 +1,12 @@
 import { Login } from '@/app/usecases/account/login'
 import { LoginUseCaseInput } from '@/domain/usecases/account/login'
 import { faker } from '@faker-js/faker'
-import { MissingParamError } from '@/app/errors/missing-param'
-import { EmailValidator } from '@/infra/contracts'
-import { InvalidParamError } from '@/app/errors/invalid-param'
 import { Account } from '@/domain/entities/account'
 import { AccountRepository } from '@/domain/repositories/account'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'
 import { HashComparer } from '@/app/contracts/hash-comparer'
 import { WrongPasswordError } from '@/app/errors/wrong-password'
-import {
-  generateRandomInvalidEmail,
-  generateRandomInvalidPassword,
-  generateRandomValidPassword,
-} from '@/__tests__/helpers'
-
-class EmailValidatorStub implements EmailValidator {
-  isValid(email: string): boolean {
-    return true
-  }
-}
+import { generateRandomValidPassword } from '@/__tests__/helpers'
 
 function makeFakeAccount() {
   return {
@@ -53,22 +40,16 @@ class HashComparerStub implements HashComparer {
 
 interface SutTypes {
   sut: Login
-  emailValidatorStub: EmailValidator
   accountRepositoryStub: AccountRepository
   hashComparerStub: HashComparer
 }
 
 function makeSut(): SutTypes {
-  const emailValidatorStub = new EmailValidatorStub()
   const accountRepositoryStub = new AccountRepositoryStub()
   const hashComparerStub = new HashComparerStub()
-  const sut = new Login(
-    emailValidatorStub,
-    accountRepositoryStub,
-    hashComparerStub
-  )
+  const sut = new Login(accountRepositoryStub, hashComparerStub)
 
-  return { sut, emailValidatorStub, accountRepositoryStub, hashComparerStub }
+  return { sut, accountRepositoryStub, hashComparerStub }
 }
 
 function makeDTOWithout(

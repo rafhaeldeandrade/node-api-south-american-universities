@@ -3,9 +3,6 @@ import {
   LoginUseCaseInput,
   LoginUseCaseOutput,
 } from '@/domain/usecases/account/login'
-import { MissingParamError } from '@/app/errors/missing-param'
-import { EmailValidator } from '@/infra/contracts'
-import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountRepository } from '@/domain/repositories/account'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'
 import { HashComparer } from '@/app/contracts/hash-comparer'
@@ -13,7 +10,6 @@ import { WrongPasswordError } from '@/app/errors/wrong-password'
 
 export class Login implements LoginUseCase {
   constructor(
-    private readonly emailValidator: EmailValidator,
     private readonly accountRepository: AccountRepository,
     private readonly hashComparer: HashComparer
   ) {}

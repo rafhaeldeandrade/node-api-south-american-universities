@@ -1,27 +1,14 @@
 import { CreateAccount } from '@/app/usecases/account/create-account'
 import { CreateAccountUseCaseInput } from '@/domain/usecases/account/create-account'
 import { faker } from '@faker-js/faker'
-import { MissingParamError } from '@/app/errors/missing-param'
-import { InvalidParamError } from '@/app/errors/invalid-param'
 import { AccountRepository } from '@/domain/repositories/account'
 import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
 import { Account } from '@/domain/entities/account'
-import { EmailValidator } from '@/infra/contracts'
 import { Hasher } from '@/app/contracts/hasher'
 import { Encrypter } from '@/app/contracts/encrypter'
 import { UUIDGenerator } from '@/app/contracts/uuid-generator'
 import { makeAccount } from '@/__tests__/factories/account'
-import {
-  generateRandomInvalidEmail,
-  generateRandomInvalidPassword,
-  generateRandomValidPassword,
-} from '@/__tests__/helpers'
-
-class EmailValidatorStub implements EmailValidator {
-  isValid(email: string): boolean {
-    return true
-  }
-}
+import { generateRandomValidPassword } from '@/__tests__/helpers'
 
 class AccountRepositoryStub implements AccountRepository {
   findByEmail(email: string) {
@@ -57,7 +44,6 @@ class UUIDGeneratorStub implements UUIDGenerator {
 
 interface SutTypes {
   sut: CreateAccount
-  emailValidatorStub: EmailValidator
   accountRepositoryStub: AccountRepository
   hasherStub: Hasher
   encrypterStub: Encrypter
@@ -65,13 +51,11 @@ interface SutTypes {
 }
 
 function makeSut(): SutTypes {
-  const emailValidatorStub = new EmailValidatorStub()
   const accountRepositoryStub = new AccountRepositoryStub()
   const hasherStub = new HasherStub()
   const encrypterStub = new EncrypterStub()
   const uuidGeneratorStub = new UUIDGeneratorStub()
   const sut = new CreateAccount(
-    emailValidatorStub,
     accountRepositoryStub,
     uuidGeneratorStub,
     hasherStub,
@@ -79,7 +63,6 @@ function makeSut(): SutTypes {
   )
   return {
     sut,
-    emailValidatorStub,
     accountRepositoryStub,
     uuidGeneratorStub,
     hasherStub,
