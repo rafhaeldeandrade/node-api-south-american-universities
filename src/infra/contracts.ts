@@ -13,10 +13,6 @@ export interface HttpResponse {
   body: any
 }
 
-export interface EmailValidator {
-  isValid: (email: string) => boolean
-}
-
 export interface SchemaValidator {
   validate: (input: any) => Promise<Error | null>
 }
