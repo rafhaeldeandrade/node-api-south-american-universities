@@ -117,7 +117,7 @@ describe('POST /login', () => {
     })
   })
 
-  it('should return 401 when email is invalid', async () => {
+  it('should return 400 when email is invalid', async () => {
     const fakeId = faker.datatype.uuid()
     jest
       .spyOn(CryptoUUIDGeneratorAdapter.prototype, 'generateUUID')
@@ -138,14 +138,14 @@ describe('POST /login', () => {
 
     const response = await request(app).post('/api/v1/login').send(accountProps)
 
-    expect(response.status).toBe(401)
+    expect(response.status).toBe(400)
     expect(response.body).toEqual({
       error: true,
-      message: 'Wrong credentials',
+      message: 'email param is invalid',
     })
   })
 
-  it('should return 401 when password is invalid', async () => {
+  it('should return 400 when password is invalid', async () => {
     const fakeId = faker.datatype.uuid()
     jest
       .spyOn(CryptoUUIDGeneratorAdapter.prototype, 'generateUUID')
@@ -166,10 +166,10 @@ describe('POST /login', () => {
 
     const response = await request(app).post('/api/v1/login').send(accountProps)
 
-    expect(response.status).toBe(401)
+    expect(response.status).toBe(400)
     expect(response.body).toEqual({
       error: true,
-      message: 'Wrong credentials',
+      message: 'password param is invalid',
     })
   })
 

@@ -89,68 +89,6 @@ describe('Login Use Case', () => {
     jest.restoreAllMocks()
   })
 
-  it('should throw MissingParamError if email is not provided', async () => {
-    const { sut } = makeSut()
-    const dto = makeDTOWithout('email')
-
-    const result = sut.execute(dto as any)
-
-    await expect(result).rejects.toThrow(new MissingParamError('email'))
-  })
-
-  it('should throw MissingParamError if password is not provided', async () => {
-    const { sut } = makeSut()
-    const dto = makeDTOWithout('password')
-
-    const result = sut.execute(dto as any)
-
-    await expect(result).rejects.toThrow(new MissingParamError('password'))
-  })
-
-  it('should call EmailValidator.isValid with the correct value', async () => {
-    const { sut, emailValidatorStub } = makeSut()
-    const validateSpy = jest.spyOn(emailValidatorStub, 'isValid')
-    const dto = makeDTOWithout()
-
-    await sut.execute(dto as LoginUseCaseInput)
-
-    expect(validateSpy).toHaveBeenCalledTimes(1)
-    expect(validateSpy).toHaveBeenCalledWith(dto.email)
-  })
-
-  it('should throw InvalidParamError if email is invalid', async () => {
-    const { sut, emailValidatorStub } = makeSut()
-    jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
-    const dto = makeDTOWithout()
-    dto.email = generateRandomInvalidEmail()
-
-    const result = sut.execute(dto as LoginUseCaseInput)
-
-    await expect(result).rejects.toThrow(new InvalidParamError('email'))
-  })
-
-  it('should throw InvalidParamError if password has less than 8 characters', async () => {
-    const { sut } = makeSut()
-
-    const dto = makeDTOWithout()
-    dto.password = generateRandomInvalidPassword().substring(0, 7)
-
-    const result = sut.execute(dto as LoginUseCaseInput)
-
-    await expect(result).rejects.toThrow(new InvalidParamError('password'))
-  })
-
-  it('should throw InvalidParamError if password doesnt have at least 1 uppercase character, 1 lowercase character and 1 special character', async () => {
-    const { sut } = makeSut()
-
-    const dto = makeDTOWithout()
-    dto.password = generateRandomInvalidPassword()
-
-    const result = sut.execute(dto as LoginUseCaseInput)
-
-    await expect(result).rejects.toThrow(new InvalidParamError('password'))
-  })
-
   it('should call AccountRepository.findByEmail with the correct value', async () => {
     const { sut, accountRepositoryStub } = makeSut()
     const findByEmailSpy = jest.spyOn(accountRepositoryStub, 'findByEmail')
