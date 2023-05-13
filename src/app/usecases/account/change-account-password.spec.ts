@@ -1,26 +1,13 @@
 import { faker } from '@faker-js/faker'
-import { EmailValidator } from '@/infra/contracts'
 import { ChangeAccountPassword } from '@/app/usecases/account/change-account-password'
 import { ChangeAccountPasswordUseCaseInput } from '@/domain/usecases/account/change-account-password'
-import { MissingParamError } from '@/app/errors/missing-param'
 import { AccountRepository } from '@/domain/repositories/account'
 import { Account } from '@/domain/entities/account'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'
 import { WrongPasswordError } from '@/app/errors/wrong-password'
 import { HashComparer } from '@/app/contracts/hash-comparer'
 import { Hasher } from '@/app/contracts/hasher'
-import { InvalidParamError } from '@/app/errors/invalid-param'
-import {
-  generateRandomInvalidEmail,
-  generateRandomInvalidPassword,
-  generateRandomValidPassword,
-} from '@/__tests__/helpers'
-
-class EmailValidatorStub implements EmailValidator {
-  isValid(email: string): boolean {
-    return true
-  }
-}
+import { generateRandomValidPassword } from '@/__tests__/helpers'
 
 function makeFakeAccount() {
   return {
@@ -60,26 +47,22 @@ class HasherStub implements Hasher {
 
 interface SutTypes {
   sut: ChangeAccountPassword
-  emailValidatorStub: EmailValidator
   accountRepositoryStub: AccountRepository
   hashComparerStub: HashComparer
   hasherStub: Hasher
 }
 
 function makeSut(): SutTypes {
-  const emailValidatorStub = new EmailValidatorStub()
   const accountRepositoryStub = new AccountRepositoryStub()
   const hashComparerStub = new HashComparerStub()
   const hasherStub = new HasherStub()
   const sut = new ChangeAccountPassword(
-    emailValidatorStub,
     accountRepositoryStub,
     hashComparerStub,
     hasherStub
   )
   return {
     sut,
-    emailValidatorStub,
     accountRepositoryStub,
     hashComparerStub,
     hasherStub,
@@ -101,98 +84,6 @@ function makeDTOWithout(
 }
 
 describe('Change Account Password Use Case', () => {
-  it('should throw MissingParamError if email is not provided', async () => {
-    const { sut } = makeSut()
-
-    const dto = makeDTOWithout('email')
-
-    const result = sut.execute(dto as any)
-
-    await expect(result).rejects.toThrow(new MissingParamError('email'))
-  })
-
-  it('should throw MissingParamError if currentPassword is not provided', async () => {
-    const { sut } = makeSut()
-
-    const dto = makeDTOWithout('currentPassword')
-
-    const result = sut.execute(dto as any)
-
-    await expect(result).rejects.toThrow(
-      new MissingParamError('currentPassword')
-    )
-  })
-
-  it('should throw MissingParamError if newPassword is not provided', async () => {
-    const { sut } = makeSut()
-
-    const dto = makeDTOWithout('newPassword')
-
-    const result = sut.execute(dto as any)
-
-    await expect(result).rejects.toThrow(new MissingParamError('newPassword'))
-  })
-
-  it('should throw InvalidParamError if email is invalid', async () => {
-    const { sut, emailValidatorStub } = makeSut()
-    jest.spyOn(emailValidatorStub, 'isValid').mockReturnValueOnce(false)
-
-    const dto = makeDTOWithout()
-    dto.email = generateRandomInvalidEmail()
-
-    const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
-
-    await expect(result).rejects.toThrow(new InvalidParamError('email'))
-  })
-
-  it('should throw InvalidParamError if currentPassword has less than 8 characters', async () => {
-    const { sut } = makeSut()
-
-    const dto = makeDTOWithout()
-    dto.currentPassword = generateRandomInvalidPassword().substring(0, 7)
-
-    const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
-
-    await expect(result).rejects.toThrow(
-      new InvalidParamError('currentPassword')
-    )
-  })
-
-  it('should throw InvalidParamError if currentPassword doesnt have at least 1 uppercase character, 1 lowercase character and 1 special character', async () => {
-    const { sut } = makeSut()
-
-    const dto = makeDTOWithout()
-    dto.currentPassword = generateRandomInvalidPassword()
-
-    const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
-
-    await expect(result).rejects.toThrow(
-      new InvalidParamError('currentPassword')
-    )
-  })
-
-  it('should throw InvalidParamError if newPassword has less than 8 characters', async () => {
-    const { sut } = makeSut()
-
-    const dto = makeDTOWithout()
-    dto.newPassword = generateRandomInvalidPassword().substring(0, 7)
-
-    const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
-
-    await expect(result).rejects.toThrow(new InvalidParamError('newPassword'))
-  })
-
-  it('should throw InvalidParamError if newPassword doesnt have at least 1 uppercase character, 1 lowercase character and 1 special character', async () => {
-    const { sut } = makeSut()
-
-    const dto = makeDTOWithout()
-    dto.newPassword = generateRandomInvalidPassword()
-
-    const result = sut.execute(dto as ChangeAccountPasswordUseCaseInput)
-
-    await expect(result).rejects.toThrow(new InvalidParamError('newPassword'))
-  })
-
   it('should call AccountRepository.findByEmail with the correct value', async () => {
     const { sut, accountRepositoryStub } = makeSut()
     const findByEmailSpy = jest.spyOn(accountRepositoryStub, 'findByEmail')
