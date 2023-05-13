@@ -56,6 +56,10 @@ function makeUseCaseReturn(): CreateAccountUseCaseOutput {
 }
 
 describe('Create Account Controller', () => {
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
   it('should call schemaValidator.validate with the correct values', async () => {
     const { sut, schemaValidatorStub } = makeSut()
     const request = makeRequest()
