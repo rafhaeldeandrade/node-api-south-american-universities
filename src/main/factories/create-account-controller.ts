@@ -7,8 +7,21 @@ import { CreateAccount } from '@/app/usecases/account/create-account'
 import { CryptoUUIDGeneratorAdapter } from '@/infra/cryptography/crypto/uuid-generator'
 import { JwtAdapter } from '@/infra/cryptography/jwt/jwt-adapter'
 import { CreateAccountController } from '@/infra/controllers/account/create-account'
+import { ZodSchemaValidator } from '@/infra/utils/schema-validator'
+import { z } from 'zod'
 
 export function makeCreateAccountController(): Controller {
+  const zodSchema = z.object({
+    name: z.string().min(3).max(50),
+    email: z.string().email(),
+    password: z
+      .string()
+      .regex(
+        new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[.!@#$%^&*()]).{8,}$/)
+      ),
+  })
+  const zodSchemaValidator = new ZodSchemaValidator(zodSchema)
+
   const emailValidator = new EmailValidatorAdapter()
   const accountRepository = new MongoDBAccountRepository()
   const uuidGenerator = new CryptoUUIDGeneratorAdapter()
@@ -22,5 +35,5 @@ export function makeCreateAccountController(): Controller {
     encrypter
   )
 
-  return new CreateAccountController(useCase)
+  return new CreateAccountController(zodSchemaValidator, useCase)
 }

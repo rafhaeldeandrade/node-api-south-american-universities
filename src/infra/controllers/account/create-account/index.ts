@@ -1,15 +1,29 @@
 import { CreateAccountUseCase } from '@/domain/usecases/account/create-account'
-import { Controller, HttpRequest, HttpResponse } from '@/infra/contracts'
-import { created } from '@/infra/helpers/http'
+import {
+  Controller,
+  HttpRequest,
+  HttpResponse,
+  SchemaValidator,
+} from '@/infra/contracts'
+import { badRequest, created } from '@/infra/helpers/http'
 import { adaptError } from '@/infra/controllers/account/create-account/error-adapter'
 
 export class CreateAccountController implements Controller {
-  constructor(private readonly useCase: CreateAccountUseCase) {}
+  constructor(
+    private readonly schemaValidator: SchemaValidator,
+    private readonly useCase: CreateAccountUseCase
+  ) {}
 
   async handle(request: HttpRequest): Promise<HttpResponse> {
     try {
-      const body = request.body || {}
-      const result = await this.useCase.execute(body)
+      const error = await this.schemaValidator.validate(request.body)
+      if (error) return badRequest(error)
+
+      const result = await this.useCase.execute({
+        name: request.body.name,
+        email: request.body.email,
+        password: request.body.password,
+      })
 
       return created(result)
     } catch (e: unknown) {
