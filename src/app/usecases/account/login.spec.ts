@@ -1,37 +1,13 @@
 import { Login } from '@/app/usecases/account/login'
 import { LoginUseCaseInput } from '@/domain/usecases/account/login'
 import { faker } from '@faker-js/faker'
-import { Account } from '@/domain/entities/account'
 import { AccountRepository } from '@/domain/repositories/account'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'
 import { HashComparer } from '@/app/contracts/hash-comparer'
 import { WrongPasswordError } from '@/app/errors/wrong-password'
 import { generateRandomValidPassword } from '@/__tests__/helpers'
-
-function makeFakeAccount() {
-  return {
-    id: faker.datatype.uuid(),
-    name: faker.name.fullName(),
-    email: faker.internet.email(),
-    password: generateRandomValidPassword(),
-    accessToken: faker.datatype.uuid(),
-  }
-}
-
-class AccountRepositoryStub implements AccountRepository {
-  findByEmail(email: string) {
-    return Promise.resolve(makeFakeAccount())
-  }
-
-  save(account: Account) {
-    return Promise.resolve(makeFakeAccount())
-  }
-
-  findByIdAndUpdate() {
-    return Promise.resolve()
-  }
-}
-
+import { makeAccountRepositoryStub } from '@/__tests__/factories/account-repository'
+import { makeAccount } from '@/__tests__/factories/account'
 class HashComparerStub implements HashComparer {
   async compare(value: string, hash: string): Promise<boolean> {
     return true
@@ -45,7 +21,7 @@ interface SutTypes {
 }
 
 function makeSut(): SutTypes {
-  const accountRepositoryStub = new AccountRepositoryStub()
+  const accountRepositoryStub = makeAccountRepositoryStub()
   const hashComparerStub = new HashComparerStub()
   const sut = new Login(accountRepositoryStub, hashComparerStub)
 
@@ -93,7 +69,7 @@ describe('Login Use Case', () => {
 
   it('should call HashComparer.compare with the correct values', async () => {
     const { sut, accountRepositoryStub, hashComparerStub } = makeSut()
-    const fakeAccount = makeFakeAccount()
+    const fakeAccount = makeAccount()
     jest
       .spyOn(accountRepositoryStub, 'findByEmail')
       .mockResolvedValueOnce(fakeAccount)
@@ -118,7 +94,7 @@ describe('Login Use Case', () => {
 
   it('should return accessToken on success', async () => {
     const { sut, accountRepositoryStub } = makeSut()
-    const fakeAccount = makeFakeAccount()
+    const fakeAccount = makeAccount()
     jest
       .spyOn(accountRepositoryStub, 'findByEmail')
       .mockResolvedValueOnce(fakeAccount)

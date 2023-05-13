@@ -2,12 +2,13 @@ import { faker } from '@faker-js/faker'
 import { ChangeAccountPassword } from '@/app/usecases/account/change-account-password'
 import { ChangeAccountPasswordUseCaseInput } from '@/domain/usecases/account/change-account-password'
 import { AccountRepository } from '@/domain/repositories/account'
-import { Account } from '@/domain/entities/account'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'
 import { WrongPasswordError } from '@/app/errors/wrong-password'
 import { HashComparer } from '@/app/contracts/hash-comparer'
 import { Hasher } from '@/app/contracts/hasher'
 import { generateRandomValidPassword } from '@/__tests__/helpers'
+import { makeAccountRepositoryStub } from '@/__tests__/factories/account-repository'
+import { makeAccount } from '@/__tests__/factories/account'
 
 function makeFakeAccount() {
   return {
@@ -16,20 +17,6 @@ function makeFakeAccount() {
     email: faker.internet.email(),
     password: generateRandomValidPassword(),
     accessToken: faker.datatype.uuid(),
-  }
-}
-
-class AccountRepositoryStub implements AccountRepository {
-  findByEmail(email: string) {
-    return Promise.resolve(makeFakeAccount())
-  }
-
-  save(account: Account) {
-    return Promise.resolve(makeFakeAccount())
-  }
-
-  findByIdAndUpdate() {
-    return Promise.resolve()
   }
 }
 
@@ -53,7 +40,7 @@ interface SutTypes {
 }
 
 function makeSut(): SutTypes {
-  const accountRepositoryStub = new AccountRepositoryStub()
+  const accountRepositoryStub = makeAccountRepositoryStub()
   const hashComparerStub = new HashComparerStub()
   const hasherStub = new HasherStub()
   const sut = new ChangeAccountPassword(

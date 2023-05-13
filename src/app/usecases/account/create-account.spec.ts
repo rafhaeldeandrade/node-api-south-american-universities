@@ -3,26 +3,12 @@ import { CreateAccountUseCaseInput } from '@/domain/usecases/account/create-acco
 import { faker } from '@faker-js/faker'
 import { AccountRepository } from '@/domain/repositories/account'
 import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
-import { Account } from '@/domain/entities/account'
 import { Hasher } from '@/app/contracts/hasher'
 import { Encrypter } from '@/app/contracts/encrypter'
 import { UUIDGenerator } from '@/app/contracts/uuid-generator'
 import { makeAccount } from '@/__tests__/factories/account'
 import { generateRandomValidPassword } from '@/__tests__/helpers'
-
-class AccountRepositoryStub implements AccountRepository {
-  findByEmail(email: string) {
-    return Promise.resolve(null)
-  }
-
-  save(account: Account) {
-    return Promise.resolve(makeAccount())
-  }
-
-  findByIdAndUpdate() {
-    return Promise.resolve()
-  }
-}
+import { makeAccountRepositoryStub } from '@/__tests__/factories/account-repository'
 
 class HasherStub implements Hasher {
   hash(value: string) {
@@ -51,7 +37,9 @@ interface SutTypes {
 }
 
 function makeSut(): SutTypes {
-  const accountRepositoryStub = new AccountRepositoryStub()
+  const accountRepositoryStub = makeAccountRepositoryStub({
+    findByEmailMethodReturn: null,
+  })
   const hasherStub = new HasherStub()
   const encrypterStub = new EncrypterStub()
   const uuidGeneratorStub = new UUIDGeneratorStub()
