@@ -1,14 +1,18 @@
 import { faker } from '@faker-js/faker'
-import { HttpRequest } from '@/infra/contracts'
-import { MissingParamError } from '@/app/errors/missing-param'
-import { InvalidParamError } from '@/app/errors/invalid-param'
+import { HttpRequest, SchemaValidator } from '@/infra/contracts'
 import {
   LoginUseCase,
   LoginUseCaseOutput,
 } from '@/domain/usecases/account/login'
 import { LoginController } from '@/infra/controllers/account/login'
-import { WrongPasswordError } from '@/app/errors/wrong-password'
 import { AccountNotFoundError } from '@/app/errors/account-not-found'
+import { WrongPasswordError } from '@/app/errors/wrong-password'
+
+class SchemaValidatorStub implements SchemaValidator {
+  async validate(input: any): Promise<Error | null> {
+    return null
+  }
+}
 
 class LoginUseCaseStub implements LoginUseCase {
   async execute() {
@@ -20,13 +24,15 @@ class LoginUseCaseStub implements LoginUseCase {
 
 interface SutTypes {
   sut: LoginController
+  schemaValidatorStub: SchemaValidator
   loginUseCaseStub: LoginUseCase
 }
 
 function makeSut(): SutTypes {
+  const schemaValidatorStub = new SchemaValidatorStub()
   const loginUseCaseStub = new LoginUseCaseStub()
-  const sut = new LoginController(loginUseCaseStub)
-  return { sut, loginUseCaseStub }
+  const sut = new LoginController(schemaValidatorStub, loginUseCaseStub)
+  return { sut, schemaValidatorStub, loginUseCaseStub }
 }
 
 function makeRequest(): HttpRequest {
@@ -49,120 +55,131 @@ describe('Login Controller', () => {
     jest.restoreAllMocks()
   })
 
-  it('should call LoginUseCase.execute with the correct values', async () => {
+  it('should call schemaValidator.validate with the correct values', async () => {
+    const { sut, schemaValidatorStub } = makeSut()
+    const request = makeRequest()
+    const validateSpy = jest.spyOn(schemaValidatorStub, 'validate')
+
+    await sut.handle(request)
+
+    expect(validateSpy).toHaveBeenCalledTimes(1)
+    expect(validateSpy).toHaveBeenCalledWith(request.body)
+  })
+
+  it('should return 400 if schemaValidator.validate returns an error', async () => {
+    const { sut, schemaValidatorStub } = makeSut()
+    const request = makeRequest()
+    const error = new Error('teste')
+    jest.spyOn(schemaValidatorStub, 'validate').mockResolvedValueOnce(error)
+
+    const promise = sut.handle(request)
+
+    await expect(promise).resolves.toEqual({
+      statusCode: 400,
+      body: {
+        error: true,
+        message: error.message,
+      },
+    })
+  })
+
+  it('should return 500 if schemaValidator.validate throws an error', async () => {
+    const { sut, schemaValidatorStub } = makeSut()
+    const request = makeRequest()
+    jest
+      .spyOn(schemaValidatorStub, 'validate')
+      .mockRejectedValueOnce(new Error())
+
+    const promise = sut.handle(request)
+
+    await expect(promise).resolves.toEqual({
+      statusCode: 500,
+      body: {
+        error: true,
+        message: 'Internal Server Error',
+      },
+    })
+  })
+
+  it('should call addUniversityUseCase.execute with the correct values', async () => {
     const { sut, loginUseCaseStub } = makeSut()
-    const executeSpy = jest.spyOn(loginUseCaseStub, 'execute')
+    const addSpy = jest.spyOn(loginUseCaseStub, 'execute')
     const request = makeRequest()
 
     await sut.handle(request)
 
-    expect(executeSpy).toHaveBeenCalledTimes(1)
-    expect(executeSpy).toHaveBeenCalledWith(request.body)
-  })
-
-  it('should call LoginUseCase.execute with the correct values when request has no body', async () => {
-    const { sut, loginUseCaseStub } = makeSut()
-    const executeSpy = jest.spyOn(loginUseCaseStub, 'execute')
-    const request = makeRequest()
-    const requestWithNoBody = { ...request, body: undefined }
-
-    await sut.handle(requestWithNoBody)
-
-    expect(executeSpy).toHaveBeenCalledTimes(1)
-    expect(executeSpy).toHaveBeenCalledWith({})
-  })
-
-  it('should return 200 with the correct value on success', async () => {
-    const { sut, loginUseCaseStub } = makeSut()
-    const request = makeRequest()
-    const fakeUseCaseReturn = makeUseCaseReturn()
-    jest
-      .spyOn(loginUseCaseStub, 'execute')
-      .mockResolvedValueOnce(fakeUseCaseReturn)
-
-    const httpResponse = await sut.handle(request)
-
-    expect(httpResponse.statusCode).toBe(200)
-    expect(httpResponse.body).toEqual(fakeUseCaseReturn)
-  })
-
-  it('should return 400 if useCase throws MissingParamError', async () => {
-    const { sut, loginUseCaseStub } = makeSut()
-    const request = makeRequest()
-    const paramName = faker.internet.userName()
-    jest
-      .spyOn(loginUseCaseStub, 'execute')
-      .mockRejectedValueOnce(new MissingParamError(paramName))
-
-    const httpResponse = await sut.handle(request)
-
-    expect(httpResponse.statusCode).toBe(400)
-    expect(httpResponse.body).toEqual({
-      error: true,
-      message: `${paramName} param is missing`,
+    expect(addSpy).toHaveBeenCalledTimes(1)
+    expect(addSpy).toHaveBeenCalledWith({
+      email: request?.body?.email,
+      password: request?.body?.password,
     })
   })
 
-  it('should return 401 if useCase throws InvalidParamError', async () => {
+  it('should return 500 if use case throws an error', async () => {
     const { sut, loginUseCaseStub } = makeSut()
     const request = makeRequest()
-    const paramName = faker.internet.userName()
-    jest
-      .spyOn(loginUseCaseStub, 'execute')
-      .mockRejectedValueOnce(new InvalidParamError(paramName))
+    jest.spyOn(loginUseCaseStub, 'execute').mockRejectedValueOnce(new Error())
 
-    const httpResponse = await sut.handle(request)
+    const promise = sut.handle(request)
 
-    expect(httpResponse.statusCode).toBe(401)
-    expect(httpResponse.body).toEqual({
-      error: true,
-      message: 'Wrong credentials',
+    await expect(promise).resolves.toEqual({
+      statusCode: 500,
+      body: {
+        error: true,
+        message: 'Internal Server Error',
+      },
     })
   })
 
-  it('should return 401 if useCase throws AccountNotFoundError', async () => {
+  it('should return 401 if use case throws AccountNotFoundError', async () => {
     const { sut, loginUseCaseStub } = makeSut()
     const request = makeRequest()
     jest
       .spyOn(loginUseCaseStub, 'execute')
       .mockRejectedValueOnce(new AccountNotFoundError())
 
-    const httpResponse = await sut.handle(request)
+    const promise = sut.handle(request)
 
-    expect(httpResponse.statusCode).toBe(401)
-    expect(httpResponse.body).toEqual({
-      error: true,
-      message: 'Wrong credentials',
+    await expect(promise).resolves.toEqual({
+      statusCode: 401,
+      body: {
+        error: true,
+        message: 'Wrong credentials',
+      },
     })
   })
 
-  it('should return 401 if useCase throws WrongPasswordError', async () => {
+  it('should return 401 if use case throws WrongPasswordError', async () => {
     const { sut, loginUseCaseStub } = makeSut()
     const request = makeRequest()
     jest
       .spyOn(loginUseCaseStub, 'execute')
       .mockRejectedValueOnce(new WrongPasswordError())
 
-    const httpResponse = await sut.handle(request)
+    const promise = sut.handle(request)
 
-    expect(httpResponse.statusCode).toBe(401)
-    expect(httpResponse.body).toEqual({
-      error: true,
-      message: 'Wrong credentials',
+    await expect(promise).resolves.toEqual({
+      statusCode: 401,
+      body: {
+        error: true,
+        message: 'Wrong credentials',
+      },
     })
   })
 
-  it('should return 500 if useCase throws another Error not covered yet', async () => {
+  it('should return 200 on success', async () => {
     const { sut, loginUseCaseStub } = makeSut()
+    const fakeUseCaseResponse = makeUseCaseReturn()
+    jest
+      .spyOn(loginUseCaseStub, 'execute')
+      .mockResolvedValueOnce(fakeUseCaseResponse)
     const request = makeRequest()
-    jest.spyOn(loginUseCaseStub, 'execute').mockRejectedValueOnce(new Error())
 
-    const httpResponse = await sut.handle(request)
+    const promise = sut.handle(request)
 
-    expect(httpResponse.statusCode).toBe(500)
-    expect(httpResponse.body).toEqual({
-      error: true,
-      message: `Internal Server Error`,
+    await expect(promise).resolves.toEqual({
+      statusCode: 200,
+      body: fakeUseCaseResponse,
     })
   })
 })
