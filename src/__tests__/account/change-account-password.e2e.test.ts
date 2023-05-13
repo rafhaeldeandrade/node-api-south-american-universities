@@ -19,7 +19,7 @@ let mongod: MongoMemoryServer = null as any
 
 const hasher = new Argon2HasherAdapter(env.argon2Options)
 
-describe('POST /login', () => {
+describe('POST /change-password', () => {
   beforeAll(async () => {
     mongod = await MongoMemoryServer.create()
     await mongooseHelper.connect(mongod.getUri(), {

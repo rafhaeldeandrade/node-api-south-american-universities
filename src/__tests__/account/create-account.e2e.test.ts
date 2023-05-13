@@ -19,7 +19,7 @@ let mongod: MongoMemoryServer = null as any
 
 const hasher = new Argon2HasherAdapter(env.argon2Options)
 
-describe('POST /login', () => {
+describe('POST /signup', () => {
   beforeAll(async () => {
     mongod = await MongoMemoryServer.create()
     await mongooseHelper.connect(mongod.getUri(), {
@@ -45,7 +45,6 @@ describe('POST /login', () => {
     }
 
     const response = await request(app).post('/api/v1/signup').send(newAccount)
-
     expect(response.status).toBe(201)
     expect(response.body).toEqual({
       name: newAccount.name,
