@@ -8,6 +8,7 @@
   "plugins": ["@typescript-eslint", "prettier"],
   "root": true,
   "rules": {
-    "prettier/prettier": ["error"]
+    "prettier/prettier": ["error"],
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
   }
 }
