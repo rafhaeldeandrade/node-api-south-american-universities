@@ -6,12 +6,6 @@ import {
 
 export function adaptError(e: Error) {
   switch (e.name) {
-    case 'InvalidParamError': {
-      return badRequest(e)
-    }
-    case 'MissingParamError': {
-      return badRequest(e)
-    }
     case 'AccountNotFoundError': {
       return unauthorized()
     }
