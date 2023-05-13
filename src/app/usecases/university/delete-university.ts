@@ -1,10 +1,10 @@
+import { UniversityNotFoundError } from '@/app/errors/university-not-found'
+import { UniversityRepository } from '@/domain/repositories/university'
 import {
   DeleteUniversityUseCase,
   DeleteUniversityUseCaseInput,
   DeleteUniversityUseCaseOutput,
 } from '@/domain/usecases/university/delete-university'
-import { UniversityRepository } from '@/domain/repositories/university'
-import { UniversityNotFoundError } from '@/app/errors/university-not-found'
 
 export class DeleteUniversity implements DeleteUniversityUseCase {
   constructor(private readonly universityRepository: UniversityRepository) {}

@@ -1,10 +1,10 @@
 import { z } from 'zod'
 
-import { Controller } from '@/infra/contracts'
-import { ZodSchemaValidator } from '@/infra/utils/schema-validator'
-import { MongoDBUniversityRepository } from '@/infra/mongodb/repositories/university'
 import { UpdateUniversity } from '@/app/usecases/university/update-university'
+import { Controller } from '@/infra/contracts'
 import { UpdateUniversityController } from '@/infra/controllers/university/update-university'
+import { MongoDBUniversityRepository } from '@/infra/mongodb/repositories/university'
+import { ZodSchemaValidator } from '@/infra/utils/schema-validator'
 
 export function makeUpdateUniversityController(): Controller {
   const zodSchema = z.object({

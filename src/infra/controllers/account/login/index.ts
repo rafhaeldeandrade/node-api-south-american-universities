@@ -1,12 +1,12 @@
+import { LoginUseCase } from '@/domain/usecases/account/login'
 import {
   Controller,
   HttpRequest,
   HttpResponse,
   SchemaValidator,
 } from '@/infra/contracts'
-import { badRequest, ok } from '@/infra/helpers/http'
 import { adaptError } from '@/infra/controllers/account/login/error-adapter'
-import { LoginUseCase } from '@/domain/usecases/account/login'
+import { badRequest, ok } from '@/infra/helpers/http'
 
 export class LoginController implements Controller {
   constructor(

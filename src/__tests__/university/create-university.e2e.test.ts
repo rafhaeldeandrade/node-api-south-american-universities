@@ -1,11 +1,11 @@
-import request from 'supertest'
-import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
+import mongoose from 'mongoose'
+import request from 'supertest'
 
-import { app } from '@/main/config/app'
+import { makeUniversity } from '@/__tests__/factories/university'
 import { mongooseHelper } from '@/infra/mongodb/helper'
 import { UniversityModel } from '@/infra/mongodb/schemas/university'
-import { makeUniversity } from '@/__tests__/factories/university'
+import { app } from '@/main/config/app'
 
 let mongod: MongoMemoryServer = null as any
 

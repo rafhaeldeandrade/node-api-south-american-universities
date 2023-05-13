@@ -1,20 +1,20 @@
-import request from 'supertest'
-import mongoose from 'mongoose'
 import { faker } from '@faker-js/faker'
 import { MongoMemoryServer } from 'mongodb-memory-server'
+import mongoose from 'mongoose'
+import request from 'supertest'
 
-import { app } from '@/main/config/app'
+import { makeAccount } from '@/__tests__/factories/account'
+import {
+  generateRandomInvalidEmail,
+  generateRandomInvalidPassword,
+  generateRandomValidPassword,
+} from '@/__tests__/helpers'
+import { Argon2HasherAdapter } from '@/infra/cryptography/argon2/argon2-adapter'
 import { CryptoUUIDGeneratorAdapter } from '@/infra/cryptography/crypto/uuid-generator'
 import { mongooseHelper } from '@/infra/mongodb/helper'
 import { AccountModel } from '@/infra/mongodb/schemas/account'
-import { Argon2HasherAdapter } from '@/infra/cryptography/argon2/argon2-adapter'
+import { app } from '@/main/config/app'
 import env from '@/main/config/environment-variables'
-import {
-  generateRandomValidPassword,
-  generateRandomInvalidEmail,
-  generateRandomInvalidPassword,
-} from '@/__tests__/helpers'
-import { makeAccount } from '@/__tests__/factories/account'
 
 let mongod: MongoMemoryServer = null as any
 

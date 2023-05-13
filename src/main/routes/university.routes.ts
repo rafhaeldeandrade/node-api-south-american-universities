@@ -1,4 +1,5 @@
 import { RequestHandler, Router } from 'express'
+
 import { adaptRoute } from '@/main/adapters/express-route-adapter'
 import { makeCreateUniversityController } from '@/main/factories/create-university-controller'
 import { makeDeleteUniversityController } from '@/main/factories/delete-university-controller'

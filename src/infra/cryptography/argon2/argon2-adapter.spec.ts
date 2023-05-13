@@ -1,6 +1,7 @@
-import { Argon2HasherAdapter } from '@/infra/cryptography/argon2/argon2-adapter'
 import { faker } from '@faker-js/faker'
 import argon2 from 'argon2'
+
+import { Argon2HasherAdapter } from '@/infra/cryptography/argon2/argon2-adapter'
 
 interface SutTypes {
   sut: Argon2HasherAdapter

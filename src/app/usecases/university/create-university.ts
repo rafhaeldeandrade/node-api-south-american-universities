@@ -1,11 +1,11 @@
+import { UUIDGenerator } from '@/app/contracts/uuid-generator'
+import { UniversityAlreadyExistsError } from '@/app/errors/university-already-exists'
+import { UniversityRepository } from '@/domain/repositories/university'
 import {
   CreateUniversityUseCase,
   CreateUniversityUseCaseInput,
   CreateUniversityUseCaseOutput,
 } from '@/domain/usecases/university/create-university'
-import { UniversityRepository } from '@/domain/repositories/university'
-import { UniversityAlreadyExistsError } from '@/app/errors/university-already-exists'
-import { UUIDGenerator } from '@/app/contracts/uuid-generator'
 
 export class CreateUniversity implements CreateUniversityUseCase {
   constructor(

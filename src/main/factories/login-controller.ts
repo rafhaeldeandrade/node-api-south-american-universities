@@ -1,11 +1,12 @@
-import env from '@/main/config/environment-variables'
-import { LoginController } from '@/infra/controllers/account/login'
-import { Controller } from '@/infra/contracts'
-import { Login } from '@/app/usecases/account/login'
-import { MongoDBAccountRepository } from '@/infra/mongodb/repositories/account'
-import { Argon2HasherAdapter } from '@/infra/cryptography/argon2/argon2-adapter'
-import { ZodSchemaValidator } from '@/infra/utils/schema-validator'
 import { z } from 'zod'
+
+import { Login } from '@/app/usecases/account/login'
+import { Controller } from '@/infra/contracts'
+import { LoginController } from '@/infra/controllers/account/login'
+import { Argon2HasherAdapter } from '@/infra/cryptography/argon2/argon2-adapter'
+import { MongoDBAccountRepository } from '@/infra/mongodb/repositories/account'
+import { ZodSchemaValidator } from '@/infra/utils/schema-validator'
+import env from '@/main/config/environment-variables'
 
 export function makeLoginController(): Controller {
   const zodSchema = z.object({

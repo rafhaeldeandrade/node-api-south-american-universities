@@ -1,6 +1,7 @@
-import jwt from 'jsonwebtoken'
-import { JwtAdapter } from '@/infra/cryptography/jwt/jwt-adapter'
 import { faker } from '@faker-js/faker'
+import jwt from 'jsonwebtoken'
+
+import { JwtAdapter } from '@/infra/cryptography/jwt/jwt-adapter'
 
 const fakeValue = faker.datatype.uuid()
 const fakeJwtSecret = faker.datatype.string(128)

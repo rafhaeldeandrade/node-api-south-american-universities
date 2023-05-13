@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker'
 
-import { Account } from '@/domain/entities/account'
 import { generateRandomValidPassword } from '@/__tests__/helpers'
+import { Account } from '@/domain/entities/account'
 
 export function makeAccount(props?: Partial<Account>): Account {
   const account = {

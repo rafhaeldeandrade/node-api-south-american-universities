@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
-import { Controller } from '@/infra/contracts'
-import { CryptoUUIDGeneratorAdapter } from '@/infra/cryptography/crypto/uuid-generator'
-import { CreateUniversityController } from '@/infra/controllers/university/create-university'
-import { ZodSchemaValidator } from '@/infra/utils/schema-validator'
 import { CreateUniversity } from '@/app/usecases/university/create-university'
+import { Controller } from '@/infra/contracts'
+import { CreateUniversityController } from '@/infra/controllers/university/create-university'
+import { CryptoUUIDGeneratorAdapter } from '@/infra/cryptography/crypto/uuid-generator'
 import { MongoDBUniversityRepository } from '@/infra/mongodb/repositories/university'
+import { ZodSchemaValidator } from '@/infra/utils/schema-validator'
 
 export function makeCreateUniversityController(): Controller {
   const zodSchema = z.object({

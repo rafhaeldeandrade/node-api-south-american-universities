@@ -1,14 +1,14 @@
 import { faker } from '@faker-js/faker'
-import { ChangeAccountPassword } from '@/app/usecases/account/change-account-password'
-import { ChangeAccountPasswordUseCaseInput } from '@/domain/usecases/account/change-account-password'
-import { AccountRepository } from '@/domain/repositories/account'
-import { AccountNotFoundError } from '@/app/errors/account-not-found'
-import { WrongPasswordError } from '@/app/errors/wrong-password'
+
+import { makeAccountRepositoryStub } from '@/__tests__/factories/account-repository'
+import { generateRandomValidPassword } from '@/__tests__/helpers'
 import { HashComparer } from '@/app/contracts/hash-comparer'
 import { Hasher } from '@/app/contracts/hasher'
-import { generateRandomValidPassword } from '@/__tests__/helpers'
-import { makeAccountRepositoryStub } from '@/__tests__/factories/account-repository'
-import { makeAccount } from '@/__tests__/factories/account'
+import { AccountNotFoundError } from '@/app/errors/account-not-found'
+import { WrongPasswordError } from '@/app/errors/wrong-password'
+import { ChangeAccountPassword } from '@/app/usecases/account/change-account-password'
+import { AccountRepository } from '@/domain/repositories/account'
+import { ChangeAccountPasswordUseCaseInput } from '@/domain/usecases/account/change-account-password'
 
 function makeFakeAccount() {
   return {

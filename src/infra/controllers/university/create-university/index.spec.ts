@@ -1,14 +1,14 @@
 import { faker } from '@faker-js/faker'
 
-import { CreateUniversityController } from '@/infra/controllers/university/create-university'
-import { HttpRequest, SchemaValidator } from '@/infra/contracts'
+import { makeUniversity } from '@/__tests__/factories/university'
+import { UniversityAlreadyExistsError } from '@/app/errors/university-already-exists'
 import {
   CreateUniversityUseCase,
   CreateUniversityUseCaseInput,
   CreateUniversityUseCaseOutput,
 } from '@/domain/usecases/university/create-university'
-import { makeUniversity } from '@/__tests__/factories/university'
-import { UniversityAlreadyExistsError } from '@/app/errors/university-already-exists'
+import { HttpRequest, SchemaValidator } from '@/infra/contracts'
+import { CreateUniversityController } from '@/infra/controllers/university/create-university'
 
 class SchemaValidatorStub implements SchemaValidator {
   async validate(input: any): Promise<Error | null> {

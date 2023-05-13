@@ -5,8 +5,8 @@ import {
   HttpResponse,
   SchemaValidator,
 } from '@/infra/contracts'
-import { ok, badRequest } from '@/infra/helpers/http'
 import { adaptError } from '@/infra/controllers/university/update-university/error-adapter'
+import { badRequest, ok } from '@/infra/helpers/http'
 
 export class UpdateUniversityController implements Controller {
   constructor(

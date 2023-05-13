@@ -1,12 +1,7 @@
-import express, {
-  NextFunction,
-  Request,
-  Response,
-  json,
-  urlencoded,
-} from 'express'
 import cors from 'cors'
+import express, { json, Request, Response, urlencoded } from 'express'
 import rateLimit from 'express-rate-limit'
+
 import { setupRoutes } from '@/main/config/routes'
 
 export const bodyParser = json({ strict: false })

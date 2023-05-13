@@ -1,12 +1,13 @@
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import cron from 'node-cron'
-import env from '@/main/config/environment-variables'
 import { randomUUID } from 'crypto'
+import cron from 'node-cron'
+
 import { University } from '@/domain/entities/university'
-import { UniversityModel } from '@/infra/mongodb/schemas/university'
 import { mongooseHelper } from '@/infra/mongodb/helper'
+import { UniversityModel } from '@/infra/mongodb/schemas/university'
 import { UpdateModel } from '@/infra/mongodb/schemas/update'
+import env from '@/main/config/environment-variables'
 
 const currentHours = new Date().getHours()
 

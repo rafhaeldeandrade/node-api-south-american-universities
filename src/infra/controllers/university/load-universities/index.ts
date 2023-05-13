@@ -1,7 +1,7 @@
 import { LoadUniversitiesUseCase } from '@/domain/usecases/university/load-universities'
 import { Controller, HttpRequest, SchemaValidator } from '@/infra/contracts'
+import { adaptError } from '@/infra/controllers/university/load-universities/error-adapter'
 import { badRequest, ok } from '@/infra/helpers/http'
-import { adaptError } from './error-adapter'
 
 export class LoadUniversitiesController implements Controller {
   constructor(

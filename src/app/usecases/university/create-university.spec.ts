@@ -1,11 +1,11 @@
 import { faker } from '@faker-js/faker'
 
+import { UUIDGenerator } from '@/app/contracts/uuid-generator'
+import { UniversityAlreadyExistsError } from '@/app/errors/university-already-exists'
+import { CreateUniversity } from '@/app/usecases/university/create-university'
 import { University } from '@/domain/entities/university'
 import { UniversityRepository } from '@/domain/repositories/university'
-import { CreateUniversity } from '@/app/usecases/university/create-university'
 import { CreateUniversityUseCaseInput } from '@/domain/usecases/university/create-university'
-import { UniversityAlreadyExistsError } from '@/app/errors/university-already-exists'
-import { UUIDGenerator } from '@/app/contracts/uuid-generator'
 
 function makeUniversity(): University {
   return {

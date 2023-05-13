@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker'
 
-import { LoadUniversitiesController } from '@/infra/controllers/university/load-universities'
-import { internalServerError } from '@/infra/helpers/http'
+import { makeUniversity } from '@/__tests__/factories/university'
 import { LoadUniversitiesUseCase } from '@/domain/usecases/university/load-universities'
 import { SchemaValidator } from '@/infra/contracts'
-import { makeUniversity } from '@/__tests__/factories/university'
+import { LoadUniversitiesController } from '@/infra/controllers/university/load-universities'
+import { internalServerError } from '@/infra/helpers/http'
 
 class SchemaValidatorStub implements SchemaValidator {
   async validate(input: any): Promise<Error | null> {

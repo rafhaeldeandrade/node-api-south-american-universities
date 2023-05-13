@@ -1,5 +1,6 @@
-import { University } from '@/domain/entities/university'
 import { faker } from '@faker-js/faker'
+
+import { University } from '@/domain/entities/university'
 
 export function makeUniversity(props?: Partial<University>): University {
   const university = {

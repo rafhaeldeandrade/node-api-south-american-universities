@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker'
 
+import { makeUniversity } from '@/__tests__/factories/university'
 import { LoadUniversities } from '@/app/usecases/university/load-universities'
+import { University } from '@/domain/entities/university'
 import { UniversityRepository } from '@/domain/repositories/university'
 import { LoadUniversitiesUseCaseInput } from '@/domain/usecases/university/load-universities'
-import { makeUniversity } from '@/__tests__/factories/university'
-import { University } from '@/domain/entities/university'
 
 class UniversityRepositoryStub implements UniversityRepository {
   async findByProperties(

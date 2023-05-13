@@ -1,13 +1,14 @@
-import { Login } from '@/app/usecases/account/login'
-import { LoginUseCaseInput } from '@/domain/usecases/account/login'
 import { faker } from '@faker-js/faker'
-import { AccountRepository } from '@/domain/repositories/account'
-import { AccountNotFoundError } from '@/app/errors/account-not-found'
-import { HashComparer } from '@/app/contracts/hash-comparer'
-import { WrongPasswordError } from '@/app/errors/wrong-password'
-import { generateRandomValidPassword } from '@/__tests__/helpers'
-import { makeAccountRepositoryStub } from '@/__tests__/factories/account-repository'
+
 import { makeAccount } from '@/__tests__/factories/account'
+import { makeAccountRepositoryStub } from '@/__tests__/factories/account-repository'
+import { generateRandomValidPassword } from '@/__tests__/helpers'
+import { HashComparer } from '@/app/contracts/hash-comparer'
+import { AccountNotFoundError } from '@/app/errors/account-not-found'
+import { WrongPasswordError } from '@/app/errors/wrong-password'
+import { Login } from '@/app/usecases/account/login'
+import { AccountRepository } from '@/domain/repositories/account'
+import { LoginUseCaseInput } from '@/domain/usecases/account/login'
 class HashComparerStub implements HashComparer {
   async compare(value: string, hash: string): Promise<boolean> {
     return true

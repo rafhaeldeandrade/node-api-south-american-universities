@@ -1,14 +1,15 @@
-import { CreateAccount } from '@/app/usecases/account/create-account'
-import { CreateAccountUseCaseInput } from '@/domain/usecases/account/create-account'
 import { faker } from '@faker-js/faker'
-import { AccountRepository } from '@/domain/repositories/account'
-import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
-import { Hasher } from '@/app/contracts/hasher'
-import { Encrypter } from '@/app/contracts/encrypter'
-import { UUIDGenerator } from '@/app/contracts/uuid-generator'
+
 import { makeAccount } from '@/__tests__/factories/account'
-import { generateRandomValidPassword } from '@/__tests__/helpers'
 import { makeAccountRepositoryStub } from '@/__tests__/factories/account-repository'
+import { generateRandomValidPassword } from '@/__tests__/helpers'
+import { Encrypter } from '@/app/contracts/encrypter'
+import { Hasher } from '@/app/contracts/hasher'
+import { UUIDGenerator } from '@/app/contracts/uuid-generator'
+import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
+import { CreateAccount } from '@/app/usecases/account/create-account'
+import { AccountRepository } from '@/domain/repositories/account'
+import { CreateAccountUseCaseInput } from '@/domain/usecases/account/create-account'
 
 class HasherStub implements Hasher {
   hash(value: string) {

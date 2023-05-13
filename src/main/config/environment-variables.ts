@@ -1,5 +1,5 @@
-import * as dotenv from 'dotenv'
 import argon2 from 'argon2'
+import * as dotenv from 'dotenv'
 
 const envFile = {
   test: '.env.test',

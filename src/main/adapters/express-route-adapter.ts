@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+
 import { Controller } from '@/infra/contracts'
 
 export function adaptRoute(controller: Controller) {

@@ -1,4 +1,5 @@
 import argon2 from 'argon2'
+
 import { HashComparer } from '@/app/contracts/hash-comparer'
 import { Hasher } from '@/app/contracts/hasher'
 

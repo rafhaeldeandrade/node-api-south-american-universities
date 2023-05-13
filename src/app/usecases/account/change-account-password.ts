@@ -1,13 +1,13 @@
+import { HashComparer } from '@/app/contracts/hash-comparer'
+import { Hasher } from '@/app/contracts/hasher'
+import { AccountNotFoundError } from '@/app/errors/account-not-found'
+import { WrongPasswordError } from '@/app/errors/wrong-password'
+import { AccountRepository } from '@/domain/repositories/account'
 import {
   ChangeAccountPasswordUseCase,
   ChangeAccountPasswordUseCaseInput,
   ChangeAccountPasswordUseCaseOutput,
 } from '@/domain/usecases/account/change-account-password'
-import { AccountRepository } from '@/domain/repositories/account'
-import { AccountNotFoundError } from '@/app/errors/account-not-found'
-import { HashComparer } from '@/app/contracts/hash-comparer'
-import { WrongPasswordError } from '@/app/errors/wrong-password'
-import { Hasher } from '@/app/contracts/hasher'
 
 export class ChangeAccountPassword implements ChangeAccountPasswordUseCase {
   constructor(

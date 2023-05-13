@@ -1,10 +1,11 @@
 import { faker } from '@faker-js/faker'
-import { DeleteUniversity } from '@/app/usecases/university/delete-university'
-import { UniversityRepository } from '@/domain/repositories/university'
-import { University } from '@/domain/entities/university'
+
 import { makeUniversity } from '@/__tests__/factories/university'
-import { DeleteUniversityUseCaseInput } from '@/domain/usecases/university/delete-university'
 import { UniversityNotFoundError } from '@/app/errors/university-not-found'
+import { DeleteUniversity } from '@/app/usecases/university/delete-university'
+import { University } from '@/domain/entities/university'
+import { UniversityRepository } from '@/domain/repositories/university'
+import { DeleteUniversityUseCaseInput } from '@/domain/usecases/university/delete-university'
 
 class UniversityRepositoryStub implements UniversityRepository {
   async findByProperties(

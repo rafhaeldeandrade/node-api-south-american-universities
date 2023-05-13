@@ -1,10 +1,10 @@
+import { UniversityNotFoundError } from '@/app/errors/university-not-found'
+import { UniversityRepository } from '@/domain/repositories/university'
 import {
   UpdateUniversityUseCase,
   UpdateUniversityUseCaseInput,
   UpdateUniversityUseCaseOutput,
 } from '@/domain/usecases/university/update-university'
-import { UniversityRepository } from '@/domain/repositories/university'
-import { UniversityNotFoundError } from '@/app/errors/university-not-found'
 
 export class UpdateUniversity implements UpdateUniversityUseCase {
   constructor(private readonly universityRepository: UniversityRepository) {}

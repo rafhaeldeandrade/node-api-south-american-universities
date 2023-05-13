@@ -1,6 +1,6 @@
+import { makeAccount } from '@/__tests__/factories/account'
 import { Account } from '@/domain/entities/account'
 import { AccountRepository } from '@/domain/repositories/account'
-import { makeAccount } from './account'
 
 class AccountRepositoryStub implements AccountRepository {
   constructor(

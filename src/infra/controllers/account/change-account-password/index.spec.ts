@@ -1,12 +1,13 @@
-import { HttpRequest, SchemaValidator } from '@/infra/contracts'
 import { faker } from '@faker-js/faker'
-import { ChangeAccountPasswordController } from '@/infra/controllers/account/change-account-password'
+
+import { AccountNotFoundError } from '@/app/errors/account-not-found'
+import { WrongPasswordError } from '@/app/errors/wrong-password'
 import {
   ChangeAccountPasswordUseCase,
   ChangeAccountPasswordUseCaseOutput,
 } from '@/domain/usecases/account/change-account-password'
-import { AccountNotFoundError } from '@/app/errors/account-not-found'
-import { WrongPasswordError } from '@/app/errors/wrong-password'
+import { HttpRequest, SchemaValidator } from '@/infra/contracts'
+import { ChangeAccountPasswordController } from '@/infra/controllers/account/change-account-password'
 
 class SchemaValidatorStub implements SchemaValidator {
   async validate(input: any): Promise<Error | null> {

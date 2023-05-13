@@ -1,6 +1,6 @@
-import env from '@/main/config/environment-variables'
 import { mongooseHelper } from '@/infra/mongodb/helper'
 import { app } from '@/main/config/app'
+import env from '@/main/config/environment-variables'
 
 mongooseHelper
   .connect(env.mongoUrl, {

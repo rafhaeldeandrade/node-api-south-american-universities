@@ -1,7 +1,7 @@
-import { HttpResponse } from '@/infra/contracts'
-import { MissingParamError } from '@/app/errors/missing-param'
-import { InvalidParamError } from '@/app/errors/invalid-param'
 import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
+import { InvalidParamError } from '@/app/errors/invalid-param'
+import { MissingParamError } from '@/app/errors/missing-param'
+import { HttpResponse } from '@/infra/contracts'
 
 export function badRequest(
   error: MissingParamError | InvalidParamError

@@ -1,10 +1,10 @@
+import { University } from '@/domain/entities/university'
+import { UniversityRepository } from '@/domain/repositories/university'
 import {
   LoadUniversitiesUseCase,
   LoadUniversitiesUseCaseInput,
   LoadUniversitiesUseCaseOutput,
 } from '@/domain/usecases/university/load-universities'
-import { UniversityRepository } from '@/domain/repositories/university'
-import { University } from '@/domain/entities/university'
 
 export class LoadUniversities implements LoadUniversitiesUseCase {
   constructor(private readonly universityRepository: UniversityRepository) {}

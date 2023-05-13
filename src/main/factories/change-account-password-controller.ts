@@ -1,12 +1,12 @@
-import env from '@/main/config/environment-variables'
-
-import { Controller } from '@/infra/contracts'
-import { MongoDBAccountRepository } from '@/infra/mongodb/repositories/account'
-import { Argon2HasherAdapter } from '@/infra/cryptography/argon2/argon2-adapter'
-import { ChangeAccountPasswordController } from '@/infra/controllers/account/change-account-password'
-import { ChangeAccountPassword } from '@/app/usecases/account/change-account-password'
-import { ZodSchemaValidator } from '@/infra/utils/schema-validator'
 import { z } from 'zod'
+
+import { ChangeAccountPassword } from '@/app/usecases/account/change-account-password'
+import { Controller } from '@/infra/contracts'
+import { ChangeAccountPasswordController } from '@/infra/controllers/account/change-account-password'
+import { Argon2HasherAdapter } from '@/infra/cryptography/argon2/argon2-adapter'
+import { MongoDBAccountRepository } from '@/infra/mongodb/repositories/account'
+import { ZodSchemaValidator } from '@/infra/utils/schema-validator'
+import env from '@/main/config/environment-variables'
 
 export function makeChangeAccountPasswordController(): Controller {
   const zodSchema = z.object({

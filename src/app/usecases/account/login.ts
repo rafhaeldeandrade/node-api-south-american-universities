@@ -1,12 +1,12 @@
+import { HashComparer } from '@/app/contracts/hash-comparer'
+import { AccountNotFoundError } from '@/app/errors/account-not-found'
+import { WrongPasswordError } from '@/app/errors/wrong-password'
+import { AccountRepository } from '@/domain/repositories/account'
 import {
   LoginUseCase,
   LoginUseCaseInput,
   LoginUseCaseOutput,
 } from '@/domain/usecases/account/login'
-import { AccountRepository } from '@/domain/repositories/account'
-import { AccountNotFoundError } from '@/app/errors/account-not-found'
-import { HashComparer } from '@/app/contracts/hash-comparer'
-import { WrongPasswordError } from '@/app/errors/wrong-password'
 
 export class Login implements LoginUseCase {
   constructor(

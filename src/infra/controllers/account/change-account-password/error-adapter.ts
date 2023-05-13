@@ -1,8 +1,4 @@
-import {
-  badRequest,
-  internalServerError,
-  unauthorized,
-} from '@/infra/helpers/http'
+import { internalServerError, unauthorized } from '@/infra/helpers/http'
 
 export function adaptError(e: Error) {
   switch (e.name) {

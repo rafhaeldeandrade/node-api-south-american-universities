@@ -1,11 +1,12 @@
 import { faker } from '@faker-js/faker'
-import { CreateAccountController } from '@/infra/controllers/account/create-account'
-import { HttpRequest, SchemaValidator } from '@/infra/contracts'
+
+import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
 import {
   CreateAccountUseCase,
   CreateAccountUseCaseOutput,
 } from '@/domain/usecases/account/create-account'
-import { EmailAlreadyExistsError } from '@/app/errors/email-already-exists'
+import { HttpRequest, SchemaValidator } from '@/infra/contracts'
+import { CreateAccountController } from '@/infra/controllers/account/create-account'
 
 class SchemaValidatorStub implements SchemaValidator {
   async validate(input: any): Promise<Error | null> {

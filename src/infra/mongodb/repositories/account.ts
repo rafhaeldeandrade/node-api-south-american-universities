@@ -1,6 +1,6 @@
 import { Account } from '@/domain/entities/account'
 import { AccountRepository } from '@/domain/repositories/account'
-import { AccountModel } from '../schemas/account'
+import { AccountModel } from '@/infra/mongodb/schemas/account'
 
 export class MongoDBAccountRepository implements AccountRepository {
   async findByEmail(email: string): Promise<Account | null> {
