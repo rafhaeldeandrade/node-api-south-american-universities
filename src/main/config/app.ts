@@ -23,14 +23,16 @@ app.use(urlencoded({ extended: false }))
 app.use(cors())
 app.use(limiter)
 
-setupRoutes(app).catch(console.error)
-
-app.use((_req: Request, res: Response) => {
-  res.status(404).json({
-    error: true,
-    message:
-      'Route not found or method not applicable, refer to documentation at https://southamericanuniversities.docs.apiary.io/ to see which routes and methods are available for now.',
+setupRoutes(app)
+  .then(() => {
+    app.use((_req: Request, res: Response) => {
+      res.status(404).json({
+        error: true,
+        message:
+          'Route not found or method not applicable, refer to documentation at https://southamericanuniversities.docs.apiary.io/ to see which routes and methods are available for now.',
+      })
+    })
   })
-})
+  .catch(console.error)
 
 export { app }
