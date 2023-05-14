@@ -21,3 +21,5 @@ const universitySchema = new mongoose.Schema(
 )
 
 export const UniversityModel = mongoose.model('University', universitySchema)
+
+universitySchema.index({ id: 1 }, { unique: true })

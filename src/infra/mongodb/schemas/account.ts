@@ -14,3 +14,6 @@ const accountSchema = new mongoose.Schema(
 )
 
 export const AccountModel = mongoose.model('Account', accountSchema)
+
+accountSchema.index({ id: 1 }, { unique: true })
+accountSchema.index({ email: 1 }, { unique: true })
