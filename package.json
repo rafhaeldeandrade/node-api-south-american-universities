@@ -12,7 +12,7 @@
     "test:staged": "npm test -- -c jest.config.ts --findRelatedTests",
     "test:ci": "npm test -- --runInBand",
     "build": "tsc --build --clean && tsc --build && tsc-alias -p tsconfig.json",
-    "start": "node ./dist/main/server.js",
+    "start": "pm2-runtime ./dist/main/server.js",
     "prepare": "husky install"
   },
   "keywords": [],
@@ -45,8 +45,7 @@
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
     "tsc-alias": "^1.8.6",
-    "tsconfig-paths": "^4.2.0",
-    "typescript": "^5.0.4"
+    "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
     "argon2": "^0.30.3",
@@ -58,6 +57,7 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.1.0",
     "node-cron": "^3.0.2",
-    "zod": "^3.21.4"
+    "zod": "^3.21.4",
+    "typescript": "^5.0.4"
   }
 }
